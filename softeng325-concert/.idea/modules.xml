@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/softeng325-concert.iml" filepath="$PROJECT_DIR$/softeng325-concert.iml" />
+      <module fileurl="file://$PROJECT_DIR$/softeng325-concert-client/softeng325-concert-client.iml" filepath="$PROJECT_DIR$/softeng325-concert-client/softeng325-concert-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/softeng325-concert-common/softeng325-concert-common.iml" filepath="$PROJECT_DIR$/softeng325-concert-common/softeng325-concert-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/softeng325-concert-service/softeng325-concert-service.iml" filepath="$PROJECT_DIR$/softeng325-concert-service/softeng325-concert-service.iml" />
+    </modules>
+  </component>
+</project>
