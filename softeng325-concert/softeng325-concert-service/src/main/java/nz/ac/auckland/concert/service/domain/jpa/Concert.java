@@ -39,8 +39,10 @@ public class Concert {
 	private Set<LocalDateTime> _dates;
 
 	@ElementCollection
-	@Column(name = "tariff")
-	@MapKeyColumn(name = "priceBand")
+	@JoinTable(name = "CONCERT_TARIFS", joinColumns = @JoinColumn(name = "_id"))
+	@MapKeyColumn(name = "price_band")
+	@Column(name = "tariff", nullable = false)
+	@MapKeyEnumerated(EnumType.STRING)
 	private Map<PriceBand, BigDecimal> _tariff;
 
 	@ManyToMany
