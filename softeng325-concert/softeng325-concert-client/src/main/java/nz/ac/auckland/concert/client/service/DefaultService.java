@@ -6,6 +6,7 @@ import nz.ac.auckland.concert.service.domain.jpa.*;
 import nz.ac.auckland.concert.service.mappers.ReservationMapper;
 import nz.ac.auckland.concert.service.mappers.SeatMapper;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
+import org.hibernate.boot.jaxb.SourceType;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -36,6 +37,7 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public Set<ConcertDTO> getConcerts() throws ServiceException {
+
         Client client = ClientBuilder.newClient();
 
         // Make an invocation on a Concert URI and specify XML as the data return type
@@ -44,11 +46,11 @@ public class DefaultService implements ConcertService {
 
         Response response = builder.get();
 
-        if (response.getStatus() == 500) {
-            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
-        } else {
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {});
             return concertDTOS;
+        } else {
+            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
     }
 
@@ -112,9 +114,6 @@ public class DefaultService implements ConcertService {
                 newUser.getPassword(),
                 newUser.getLastname(),
                 newUser.getFirstname());
-
-        System.out.println("");
-        System.out.println("in service class newuser, username: " + userDTO.getUsername());
 
         Response response = builder.post(Entity.entity(userDTO,
                 MediaType.APPLICATION_XML));
@@ -493,6 +492,5 @@ public class DefaultService implements ConcertService {
     }
 
     //TODO make sure all methods start with the setup method.
-    //TODO make sure all EM thingies are committed.
 
 }

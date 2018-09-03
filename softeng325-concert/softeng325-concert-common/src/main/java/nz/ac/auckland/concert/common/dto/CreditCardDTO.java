@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -25,10 +26,10 @@ public class CreditCardDTO {
 	@XmlElement(name="type")
 	private Type _type;
 
-	@XmlElement(name="name")
+	@XmlAttribute(name="name")
 	private String _name;
 
-	@XmlElement(name="number")
+	@XmlAttribute(name="number")
 	private String _number;
 
 	@XmlElement(name="expiryDate")

@@ -35,6 +35,8 @@ public class BookingResource {
             List<BookingDTO> bookingDTOs = BookingMapper.toDTOList(query.getResultList());
             GenericEntity<List<BookingDTO>> ge = new GenericEntity<List<BookingDTO>>(bookingDTOs) {};
 
+            em.getTransaction().commit();
+
             return Response.ok(ge).build();
 
         } finally {

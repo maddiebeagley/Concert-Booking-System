@@ -30,11 +30,11 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BookingDTO {
 
-	@XmlID
+//	@XmlID
 	@XmlAttribute(name="concertId")
 	private Long _concertId;
 
-	@XmlElement(name="concertTitle")
+	@XmlAttribute(name="concertTitle")
 	private String _concertTitle;
 
 	@XmlElement(name="dateTime")

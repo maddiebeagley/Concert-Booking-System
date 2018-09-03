@@ -19,17 +19,17 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserDTO {
 
-	@XmlID
-	@XmlElement(name="username")
+//	@XmlID
+	@XmlAttribute(name="username")
 	private String _username;
 
-	@XmlElement(name="password")
+	@XmlAttribute(name="password")
 	private String _password;
 
-	@XmlElement(name="firstname")
+	@XmlAttribute(name="firstname")
 	private String _firstname;
 
-	@XmlElement(name="lastname")
+	@XmlAttribute(name="lastname")
 	private String _lastname;
 	
 	protected UserDTO() {}

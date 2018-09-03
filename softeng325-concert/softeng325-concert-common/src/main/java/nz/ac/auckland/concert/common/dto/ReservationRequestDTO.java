@@ -7,6 +7,7 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -24,13 +25,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ReservationRequestDTO {
 
-	@XmlElement(name="numberOfSeats")
+	@XmlAttribute(name="numberOfSeats")
 	private int _numberOfSeats;
 
 	@XmlElement(name="seatType")
 	private PriceBand _seatType;
 
-	@XmlElement(name="concertId")
+	@XmlAttribute(name="concertId")
 	private Long _concertId;
 
 	@XmlElement(name="date")

@@ -9,10 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 /**
  * DTO class to represent reservations. 
@@ -30,8 +27,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ReservationDTO {
 
-    @XmlID
-    @XmlElement(name="id")
+//    @XmlID
+    @XmlAttribute(name="id")
 	private Long _id;
 
     @XmlElement(name="request")

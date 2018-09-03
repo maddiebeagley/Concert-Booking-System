@@ -30,8 +30,6 @@ public class UserResource {
 
     @POST
     public Response createUser(UserDTO newUser) {
-        System.out.println("Attempting to add new user, username: " + newUser.getUsername());
-
         // check that all required fields have been set
         if (newUser.getUsername() == null ||
                 newUser.getPassword() == null ||
@@ -80,6 +78,8 @@ public class UserResource {
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
             List<UserDTO> userDTOS = UserMapper.toDTOList(query.getResultList());
             GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {};
+
+            em.getTransaction().commit();
 
             return Response.ok(ge).build();
 

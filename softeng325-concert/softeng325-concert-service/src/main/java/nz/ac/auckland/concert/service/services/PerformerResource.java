@@ -60,6 +60,8 @@ public class PerformerResource {
             GenericEntity<List<PerformerDTO>> ge = new GenericEntity<List<PerformerDTO>>(performerDTOS) {
             };
 
+            em.getTransaction().commit();
+
             return Response.ok(ge).build();
 
         } finally {

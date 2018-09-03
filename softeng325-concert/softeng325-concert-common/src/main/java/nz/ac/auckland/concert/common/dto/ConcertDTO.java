@@ -13,6 +13,7 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,11 +35,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ConcertDTO {
 
-	@XmlID
-	@XmlElement(name="id")
+//	@XmlID
+	@XmlAttribute(name="id")
 	private Long _id;
 
-	@XmlElement(name="title")
+	@XmlAttribute(name="title")
 	private String _title;
 
 	@XmlElement(name="dates")

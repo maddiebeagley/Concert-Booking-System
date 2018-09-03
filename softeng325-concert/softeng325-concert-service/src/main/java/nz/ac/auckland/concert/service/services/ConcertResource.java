@@ -41,7 +41,11 @@ public class ConcertResource {
 
     @GET
     public Response getAllConcerts() {
+
         // Acquire an EntityManager (creating a new persistence context).
+
+        System.out.println("in the resource getAllConcerts method");
+
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
@@ -52,6 +56,8 @@ public class ConcertResource {
             List<ConcertDTO> concertDTOs = ConcertMapper.toDTOList(query.getResultList());
             GenericEntity<List<ConcertDTO>> ge = new GenericEntity<List<ConcertDTO>>(concertDTOs) {};
 
+            em.getTransaction().commit();
+
             return Response.ok(ge).build();
 
         } finally {
@@ -59,6 +65,4 @@ public class ConcertResource {
         }
     }
 
-    //TODO consider adding a get method for concerts on a certain date or in a date range
-    //TODO consider adding a get method for concerts with a certain performer
 }
