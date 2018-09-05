@@ -12,8 +12,8 @@ public class UserMapper {
         return new User(
                 userDTO.getUserName(),
                 userDTO.getPassword(),
-                userDTO.getFirstName(),
-                userDTO.getLastName());
+                userDTO.getLastName(),
+                userDTO.getFirstName());
     }
 
     public static UserDTO toDTO(User user) {
