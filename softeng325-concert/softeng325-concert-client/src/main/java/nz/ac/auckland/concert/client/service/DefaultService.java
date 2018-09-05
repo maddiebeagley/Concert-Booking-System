@@ -181,7 +181,9 @@ public class DefaultService implements ConcertService {
         }
 
         //authenticate input user by invoking a request
-        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
+        String uri = USER_WEB_SERVICE_URI + "/authenticate";
+
+        Invocation.Builder builder = client.target(uri).request();
         Response response = builder.post(Entity.entity(userDTO, MediaType.APPLICATION_XML));
         checkForServerError(response);
 

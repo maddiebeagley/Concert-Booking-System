@@ -18,12 +18,37 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="600">
-      <file leaf-file-name="ConcertServiceTest.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ConcertServiceTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1519">
-              <caret line="182" column="13" lean-forward="true" selection-start-line="182" selection-start-column="13" selection-end-line="182" selection-end-column="13" />
+            <state relative-caret-position="574">
+              <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Persistence.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar!/javax/persistence/Persistence.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="606">
+              <caret line="85" column="0" lean-forward="false" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
+              <folding>
+                <marker date="1534387064581" expanded="false" signature="0:104" ph="/.../" />
+                <marker date="1534387064581" expanded="false" signature="141:407" ph="..." />
+                <marker date="1534387064581" expanded="true" signature="440:458" ph="/**...*/" />
+                <marker date="1534387064581" expanded="true" signature="577:595" ph="/**...*/" />
+                <marker date="1534387064581" expanded="true" signature="755:2409" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="826:1837" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="1886:2403" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="2437:2444" ph="{}" />
+                <marker date="1534387064581" expanded="true" signature="2540:2622" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="2734:3357" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="3419:3535" ph="{...}" />
+                <marker date="1534387064581" expanded="true" signature="3619:4161" ph="{...}" />
+                <marker date="1534387064581" expanded="false" signature="4217:4228" ph=" { " />
+                <marker date="1534387064581" expanded="false" signature="4240:4246" ph=" }" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -38,23 +63,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DefaultService.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="DefaultService.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1456">
-              <caret line="192" column="9" lean-forward="false" selection-start-line="192" selection-start-column="9" selection-end-line="192" selection-end-column="9" />
+            <state relative-caret-position="842">
+              <caret line="133" column="40" lean-forward="false" selection-start-line="133" selection-start-column="40" selection-end-line="133" selection-end-column="40" />
               <folding>
                 <element signature="docComment;method#getConcerts#0;class#DefaultService#0" expanded="false" />
                 <element signature="method#getConcerts#0;class#DefaultService#0" expanded="false" />
                 <element signature="docComment;method#getPerformers#0;class#DefaultService#0" expanded="false" />
                 <element signature="method#getPerformers#0;class#DefaultService#0" expanded="false" />
                 <element signature="docComment;method#createUser#0;class#DefaultService#0" expanded="false" />
-                <element signature="method#createUser#0;class#DefaultService#0" expanded="false" />
                 <element signature="docComment;method#authenticateUser#0;class#DefaultService#0" expanded="false" />
                 <element signature="docComment;method#getImageForPerformer#0;class#DefaultService#0" expanded="false" />
                 <element signature="method#getImageForPerformer#0;class#DefaultService#0" expanded="false" />
                 <element signature="docComment;method#download#0;class#DefaultService#0" expanded="false" />
-                <element signature="e#11894#11896#0" expanded="false" />
+                <element signature="e#11905#11907#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -63,9 +87,11 @@
       <file leaf-file-name="UserResource.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/UserResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="385">
-              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="840">
+              <caret line="103" column="88" lean-forward="false" selection-start-line="103" selection-start-column="88" selection-end-line="103" selection-end-column="88" />
+              <folding>
+                <marker date="1536189001169" expanded="false" signature="2607:2622" ph="&lt;~&gt;" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -189,8 +215,8 @@
         <option value="$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java" />
         <option value="$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/domain/jpa/Concert.java" />
         <option value="$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/domain/jpa/User.java" />
-        <option value="$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/UserResource.java" />
         <option value="$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java" />
+        <option value="$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/UserResource.java" />
       </list>
     </option>
   </component>
@@ -760,9 +786,9 @@
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testAuthenticateUser" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUser" />
         <item index="2" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithMissingField" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUser" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
         <item index="4" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testRetrieveConcerts" />
       </list>
     </recent_temporary>
@@ -782,44 +808,44 @@
       <updated>1535749553307</updated>
       <workItem from="1535749557581" duration="49816000" />
       <workItem from="1535945109541" duration="9157000" />
-      <workItem from="1536095073759" duration="31258000" />
+      <workItem from="1536095073759" duration="33135000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="ConcertServiceTest - 2018.09.06 at 08h 54m 33s.xml">
-      <configuration name="ConcertServiceTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 10h 37m 01s.xml">
       <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUser - 2018.09.06 at 10h 27m 43s.xml">
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 10h 46m 44s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 10h 57m 03s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 11h 01m 20s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 11h 02m 08s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 11h 05m 14s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.06 at 11h 07m 51s.xml">
+      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testCreateUser - 2018.09.06 at 10h 56m 33s.xml">
       <configuration name="ConcertServiceTest.testCreateUser" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUser - 2018.09.06 at 10h 32m 57s.xml">
+    <history-entry file="ConcertServiceTest_testCreateUser - 2018.09.06 at 11h 07m 37s.xml">
       <configuration name="ConcertServiceTest.testCreateUser" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUserWithDuplicateUsername - 2018.09.06 at 10h 31m 04s.xml">
-      <configuration name="ConcertServiceTest.testCreateUserWithDuplicateUsername" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUserWithDuplicateUsername - 2018.09.06 at 10h 34m 55s.xml">
-      <configuration name="ConcertServiceTest.testCreateUserWithDuplicateUsername" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUserWithMissingField - 2018.09.06 at 10h 30m 50s.xml">
+    <history-entry file="ConcertServiceTest_testCreateUserWithMissingField - 2018.09.06 at 10h 56m 49s.xml">
       <configuration name="ConcertServiceTest.testCreateUserWithMissingField" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUserWithMissingField - 2018.09.06 at 10h 34m 41s.xml">
-      <configuration name="ConcertServiceTest.testCreateUserWithMissingField" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testRegisterCreditCard - 2018.09.05 at 22h 25m 56s.xml">
-      <configuration name="ConcertServiceTest.testRegisterCreditCard" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testRetrieveConcerts - 2018.09.06 at 10h 30m 35s.xml">
-      <configuration name="ConcertServiceTest.testRetrieveConcerts" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="90231000" />
+    <option name="totallyTimeSpent" value="92108000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="5462" y="0" width="3324" height="2810" extended-state="0" />
@@ -831,10 +857,10 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26671913" sideWeight="0.5012461" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1271028" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26671913" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26671913" sideWeight="0.4987539" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901454" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -865,19 +891,19 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java</url>
-          <line>409</line>
+          <line>411</line>
           <properties />
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java</url>
-          <line>406</line>
+          <line>408</line>
           <properties />
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java</url>
-          <line>400</line>
+          <line>402</line>
           <properties />
           <option name="timeStamp" value="16" />
         </line-breakpoint>
@@ -901,7 +927,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java</url>
-          <line>375</line>
+          <line>377</line>
           <properties />
           <option name="timeStamp" value="36" />
         </line-breakpoint>
@@ -911,22 +937,18 @@
           <properties />
           <option name="timeStamp" value="37" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java</url>
+          <line>123</line>
+          <properties />
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="42" />
+      <option name="time" value="44" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/mappers/BookingMapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="910">
-          <caret line="27" column="11" lean-forward="false" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.0_spec/1.0.1.Beta1/jboss-jaxrs-api_2.0_spec-1.0.1.Beta1.jar!/javax/ws/rs/client/ClientBuilder.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1190">
@@ -1325,6 +1347,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar!/javax/persistence/Persistence.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="606">
+          <caret line="85" column="0" lean-forward="false" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
+          <folding>
+            <marker date="1534387064581" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1534387064581" expanded="false" signature="141:407" ph="..." />
+            <marker date="1534387064581" expanded="true" signature="440:458" ph="/**...*/" />
+            <marker date="1534387064581" expanded="true" signature="577:595" ph="/**...*/" />
+            <marker date="1534387064581" expanded="true" signature="755:2409" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="826:1837" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="1886:2403" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="2437:2444" ph="{}" />
+            <marker date="1534387064581" expanded="true" signature="2540:2622" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="2734:3357" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="3419:3535" ph="{...}" />
+            <marker date="1534387064581" expanded="true" signature="3619:4161" ph="{...}" />
+            <marker date="1534387064581" expanded="false" signature="4217:4228" ph=" { " />
+            <marker date="1534387064581" expanded="false" signature="4240:4246" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/ConcertResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1435">
@@ -1333,39 +1378,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="574">
+          <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/UserResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="840">
+          <caret line="103" column="88" lean-forward="false" selection-start-line="103" selection-start-column="88" selection-end-line="103" selection-end-column="88" />
+          <folding>
+            <marker date="1536189001169" expanded="false" signature="2607:2622" ph="&lt;~&gt;" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1456">
-          <caret line="192" column="9" lean-forward="false" selection-start-line="192" selection-start-column="9" selection-end-line="192" selection-end-column="9" />
+        <state relative-caret-position="842">
+          <caret line="133" column="40" lean-forward="false" selection-start-line="133" selection-start-column="40" selection-end-line="133" selection-end-column="40" />
           <folding>
             <element signature="docComment;method#getConcerts#0;class#DefaultService#0" expanded="false" />
             <element signature="method#getConcerts#0;class#DefaultService#0" expanded="false" />
             <element signature="docComment;method#getPerformers#0;class#DefaultService#0" expanded="false" />
             <element signature="method#getPerformers#0;class#DefaultService#0" expanded="false" />
             <element signature="docComment;method#createUser#0;class#DefaultService#0" expanded="false" />
-            <element signature="method#createUser#0;class#DefaultService#0" expanded="false" />
             <element signature="docComment;method#authenticateUser#0;class#DefaultService#0" expanded="false" />
             <element signature="docComment;method#getImageForPerformer#0;class#DefaultService#0" expanded="false" />
             <element signature="method#getImageForPerformer#0;class#DefaultService#0" expanded="false" />
             <element signature="docComment;method#download#0;class#DefaultService#0" expanded="false" />
-            <element signature="e#11894#11896#0" expanded="false" />
+            <element signature="e#11905#11907#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1519">
-          <caret line="182" column="13" lean-forward="true" selection-start-line="182" selection-start-column="13" selection-end-line="182" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>

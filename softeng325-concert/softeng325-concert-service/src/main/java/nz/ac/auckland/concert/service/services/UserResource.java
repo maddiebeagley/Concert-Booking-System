@@ -55,30 +55,31 @@ public class UserResource {
         }
     }
 
-    @GET
-    public Response getAllUsers() {
-        // Acquire an EntityManager (creating a new persistence context).
-        EntityManager em = PersistenceManager.instance().createEntityManager();
-
-        try {
-            // Start a new transaction.
-            em.getTransaction().begin();
-
-            TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
-            List<UserDTO> userDTOS = UserMapper.toDTOList(query.getResultList());
-            GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {
-            };
-
-            em.getTransaction().commit();
-
-            return Response.ok(ge).build();
-
-        } finally {
-            em.close();
-        }
-    }
+//    @GET
+//    public Response getAllUsers() {
+//        // Acquire an EntityManager (creating a new persistence context).
+//        EntityManager em = PersistenceManager.instance().createEntityManager();
+//
+//        try {
+//            // Start a new transaction.
+//            em.getTransaction().begin();
+//
+//            TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
+//            List<UserDTO> userDTOS = UserMapper.toDTOList(query.getResultList());
+//            GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {
+//            };
+//
+//            em.getTransaction().commit();
+//
+//            return Response.ok(ge).build();
+//
+//        } finally {
+//            em.close();
+//        }
+//    }
 
     @POST
+    @Path("/authenticate")
     public Response authenticateUser(UserDTO userDTO) {
 
         EntityManager em = PersistenceManager.instance().createEntityManager();
@@ -93,51 +94,50 @@ public class UserResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            String dbPassword = user.getPassword();
-            String inputPassWord = userDTO.getPassword();
-
             //check that supplied password matches password in DB
-            if (!dbPassword.equals(inputPassWord)){
+            if (!user.getPassword().equals(userDTO.getPassword())){
                 return Response.status(Response.Status.EXPECTATION_FAILED).build();
             }
 
             em.getTransaction().commit();
 
+            //store the user's current token in the response for authentication purposes
+            NewCookie token = new NewCookie("token", user.getToken());
             //return the userDTO corresponding to DB user with all fields populated
-            return Response.ok(UserMapper.toDTO(user)).build();
+            return Response.ok(UserMapper.toDTO(user)).cookie(token).build();
 
         } finally {
             em.close();
         }
     }
 
-
-    @GET
-    @Path("{userName}")
-    public Response authenticateUser(@PathParam("userName") String userName) {
-
-        EntityManager em = PersistenceManager.instance().createEntityManager();
-
-        try {
-
-            em.getTransaction().begin();
-            User user = em.find(User.class, userName);
-
-            //there is no user with the specified user name
-            if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-
-
-            em.getTransaction().commit();
-
-            UserDTO userDTO = UserMapper.toDTO(user);
-            return Response.ok(userDTO).build();
-
-        } finally {
-            em.close();
-        }
-    }
+//
+////    @POST
+//    @Path("{userName}")
+//    public Response authenticateUser(@PathParam("userName") String userName) {
+////
+////        EntityManager em = PersistenceManager.instance().createEntityManager();
+////
+////        try {
+////
+////            em.getTransaction().begin();
+////            User user = em.find(User.class, userName);
+////
+////            //there is no user with the specified user name
+////            if (user == null) {
+////                return Response.status(Response.Status.NOT_FOUND).build();
+////            }
+////
+////
+////            em.getTransaction().commit();
+////
+////            UserDTO userDTO = UserMapper.toDTO(user);
+////            return Response.ok(userDTO).build();
+////
+////        } finally {
+////            em.close();
+////        }
+////    }
 
 
     @PUT
