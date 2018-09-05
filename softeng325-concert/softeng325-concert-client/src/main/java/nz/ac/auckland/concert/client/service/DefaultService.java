@@ -23,6 +23,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -48,6 +49,9 @@ public class DefaultService implements ConcertService {
     private static String PERFORMER_WEB_SERVICE_URI = "http://localhost:10000/services/performers";
     private static String USER_WEB_SERVICE_URI = "http://localhost:10000/services/users";
     private static String BOOKING_WEB_SERVICE_URI = "http://localhost:10000/services/bookings";
+
+    private UserDTO _currentAuthUser;
+    private Cookie _curAuthUserCookie;
 
     /**
      * Returns a Set of ConcertDTO objects, where each ConcertDTO instance
@@ -135,6 +139,7 @@ public class DefaultService implements ConcertService {
                 MediaType.APPLICATION_XML));
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()){
+            _currentAuthUser = newUser;
             return newUser;
             //TODO authorise new user
         } else if (response.getStatus() == Response.Status.PARTIAL_CONTENT.getStatusCode()) {

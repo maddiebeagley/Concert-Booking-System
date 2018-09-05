@@ -34,14 +34,15 @@ public class ReservationRequest {
 	@Column(name = "seatType")
 	private PriceBand _seatType;
 
-	@Column(name="concertId")
+	@Column(name = "concertId")
 	private Long _concertId;
 
-	@Column(name="date")
-	@Convert(converter=LocalDateTimeConverter.class)
+	@Column(name = "date")
+	@Convert(converter = LocalDateTimeConverter.class)
 	private LocalDateTime _date;
 
-	public ReservationRequest() {}
+	public ReservationRequest() {
+	}
 
 	public ReservationRequest(int numberOfSeats, PriceBand seatType, Long concertId, LocalDateTime date) {
 		_numberOfSeats = numberOfSeats;
@@ -57,42 +58,17 @@ public class ReservationRequest {
 	public int getNumberOfSeats() {
 		return _numberOfSeats;
 	}
-	
+
 	public PriceBand getSeatType() {
 		return _seatType;
 	}
-	
+
 	public Long getConcertId() {
 		return _concertId;
 	}
-	
+
 	public LocalDateTime getDate() {
 		return _date;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ReservationRequest))
-            return false;
-        if (obj == this)
-            return true;
 
-        ReservationRequest rhs = (ReservationRequest) obj;
-        return new EqualsBuilder().
-            append(_numberOfSeats, rhs._numberOfSeats).
-            append(_seatType, rhs._seatType).
-            append(_concertId, rhs._concertId).
-            append(_date, rhs._date).
-            isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_numberOfSeats).
-	            append(_seatType).
-	            append(_concertId).
-	            append(_date).
-	            hashCode();
-	}
 }

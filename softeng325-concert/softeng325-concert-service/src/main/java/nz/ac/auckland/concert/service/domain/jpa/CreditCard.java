@@ -62,29 +62,4 @@ public class CreditCard {
 		return _expiryDate;
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof CreditCard))
-            return false;
-        if (obj == this)
-            return true;
-
-        CreditCard rhs = (CreditCard) obj;
-        return new EqualsBuilder().
-            append(_type, rhs._type).
-            append(_name, rhs._name).
-            append(_number, rhs._number).
-            append(_expiryDate, rhs._expiryDate).
-            isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_type).
-	            append(_name).
-	            append(_number).
-	            append(_expiryDate).
-	            hashCode();
-	}
 }

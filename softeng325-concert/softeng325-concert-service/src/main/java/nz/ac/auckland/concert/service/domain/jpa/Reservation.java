@@ -57,25 +57,4 @@ public class Reservation {
 		return Collections.unmodifiableSet(_seats);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Reservation))
-            return false;
-        if (obj == this)
-            return true;
-
-        Reservation rhs = (Reservation) obj;
-        return new EqualsBuilder().
-            append(_request, rhs._request).
-            append(_seats, rhs._seats).
-            isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_request).
-	            append(_seats).
-	            hashCode();
-	}
 }

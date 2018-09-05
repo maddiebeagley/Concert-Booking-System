@@ -44,9 +44,6 @@ public class ConcertResource {
     public Response getAllConcerts() {
 
         // Acquire an EntityManager (creating a new persistence context).
-
-        System.out.println("in the resource getAllConcerts method");
-
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {

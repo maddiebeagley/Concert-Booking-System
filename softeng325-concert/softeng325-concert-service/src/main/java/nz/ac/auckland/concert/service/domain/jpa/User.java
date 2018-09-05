@@ -35,7 +35,8 @@ public class User {
 	@Column(name = "creditCard")
 	private CreditCard _creditCard;
 
-	protected User() {}
+	protected User() {
+	}
 
 	public User(String userName, String password, String lastName, String firstName) {
 		_userName = userName;
@@ -47,19 +48,19 @@ public class User {
 	public User(String userName, String password) {
 		this(userName, password, null, null);
 	}
-	
+
 	public String getUserName() {
 		return _userName;
 	}
-	
+
 	public String getPassword() {
 		return _password;
 	}
-	
+
 	public String getFirstName() {
 		return _firstName;
 	}
-	
+
 	public String getLastName() {
 		return _lastName;
 	}
@@ -80,31 +81,4 @@ public class User {
 		this._lastName = _lastName;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof User))
-            return false;
-        if (obj == this)
-            return true;
-
-        User rhs = (User) obj;
-        return new EqualsBuilder().
-            append(_userName, rhs._userName).
-            append(_password, rhs._password).
-            append(_firstName, rhs._firstName).
-            append(_lastName, rhs._lastName).
-            append(_creditCard, rhs._creditCard).
-            isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_userName).
-	            append(_password).
-	            append(_firstName).
-	            append(_password).
-	            append(_creditCard).
-	            hashCode();
-	}
 }
