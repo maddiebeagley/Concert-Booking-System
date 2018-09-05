@@ -35,6 +35,9 @@ public class User {
 	@Column(name = "creditCard")
 	private CreditCard _creditCard;
 
+	@Column(name = "token", nullable = false)
+	private String _token;
+
 	protected User() {
 	}
 
@@ -69,6 +72,10 @@ public class User {
 		return _creditCard;
 	}
 
+	public String getToken(){
+		return _token;
+	}
+
 	public void setCreditCard(CreditCard creditCard) {
 		_creditCard = creditCard;
 	}
@@ -79,6 +86,10 @@ public class User {
 
 	public void setLastName(String _lastName) {
 		this._lastName = _lastName;
+	}
+
+	public void setToken(String token) {
+		_token = token;
 	}
 
 }

@@ -50,8 +50,7 @@ public class DefaultService implements ConcertService {
     private static String USER_WEB_SERVICE_URI = "http://localhost:10000/services/users";
     private static String BOOKING_WEB_SERVICE_URI = "http://localhost:10000/services/bookings";
 
-    private UserDTO _currentAuthUser;
-    private Cookie _curAuthUserCookie;
+    private Cookie _token;
 
     /**
      * Returns a Set of ConcertDTO objects, where each ConcertDTO instance
@@ -72,8 +71,7 @@ public class DefaultService implements ConcertService {
         Response response = builder.get();
         checkForServerError(response);
 
-        Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
-        });
+        Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {});
         return concertDTOS;
     }
 
@@ -125,17 +123,20 @@ public class DefaultService implements ConcertService {
     public UserDTO createUser(UserDTO newUser) throws ServiceException {
         Client client = ClientBuilder.newClient();
 
-        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request();
-
-        Response response = builder.post(Entity.entity(newUser,
-                MediaType.APPLICATION_XML));
-
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            _currentAuthUser = newUser;
-            return newUser;
-            //TODO authorise new user
-        } else if (response.getStatus() == Response.Status.PARTIAL_CONTENT.getStatusCode()) {
+        // a request is only made if all required fields are set
+        if (newUser.getUserName() == null || newUser.getPassword() == null ||
+                newUser.getFirstName() == null || newUser.getLastName() == null) {
             throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
+        }
+
+        //send HTTP request to create new user
+        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
+        Response response = builder.post(Entity.entity(newUser, MediaType.APPLICATION_XML));
+
+        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) { //user successfully created
+            //current token is that of the newly added user
+            _token = response.getCookies().get(0);
+            return newUser;
         } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
             throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
         } else {
@@ -148,7 +149,7 @@ public class DefaultService implements ConcertService {
      * Attempts to authenticate an existing user and log them into the remote
      * service.
      *
-     * @param inputUserDTO stores the user's authentication credentials. Properties
+     * @param userDTO stores the user's authentication credentials. Properties
      *                     username and password must be set.
      * @return a UserDTO whose properties are all set.
      * @throws ServiceException in response to any of the following conditions.
@@ -171,39 +172,28 @@ public class DefaultService implements ConcertService {
      *                          Messages.SERVICE_COMMUNICATION_ERROR
      */
     @Override
-    public UserDTO authenticateUser(UserDTO inputUserDTO) throws ServiceException {
+    public UserDTO authenticateUser(UserDTO userDTO) throws ServiceException {
         Client client = ClientBuilder.newClient();
 
-        //ensures both username and password have been set
-        if (inputUserDTO.getUserName() == null || inputUserDTO.getPassword() == null) {
+        //request will only be generated if all required fields are set
+        if (userDTO.getUserName() == null || userDTO.getPassword() == null) {
             throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
         }
 
-        String userURI = USER_WEB_SERVICE_URI + "/" + inputUserDTO.getUserName();
-
-        // retrieve all users from DB to check their username fields
-        Invocation.Builder builder = client.target(userURI).request().accept(MediaType.APPLICATION_XML);
-        Response response = builder.get();
+        //authenticate input user by invoking a request
+        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
+        Response response = builder.post(Entity.entity(userDTO, MediaType.APPLICATION_XML));
         checkForServerError(response);
 
         //there is no user with the given username
         if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-        }
-
-        UserDTO DBUserDTO = response.readEntity(UserDTO.class);
-
-        //check if supplied password matches the password stored in the DB
-        if (!DBUserDTO.getPassword().equals(inputUserDTO.getPassword())) {
+        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()){
             throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
         }
 
-        //set the remaining fields of the DTO object
-        inputUserDTO.setFirstName(DBUserDTO.getFirstName());
-        inputUserDTO.setLastName(DBUserDTO.getLastName());
-
-        _currentAuthUser = inputUserDTO;
-        return inputUserDTO;
+        userDTO = response.readEntity(UserDTO.class);
+        return userDTO;
     }
 
     /**
@@ -355,10 +345,6 @@ public class DefaultService implements ConcertService {
     @Override
     public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequestDTO) throws ServiceException {
 
-        if (_currentAuthUser == null) {
-            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
-        }
-
         Client client = ClientBuilder.newClient();
 
         //verifies that all required fields are not null
@@ -398,14 +384,14 @@ public class DefaultService implements ConcertService {
         Set<BookingDTO> bookingDTOs = bookingResponse.readEntity(new GenericType<Set<BookingDTO>>() {});
 
 //        Set<SeatDTO> bookedSeats = bookingDTO.getSeats();
-//
-        //TODO use methods properly! need to book a subset of available seats!
+
+////        TODO use methods properly! need to book a subset of available seats!
 //        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
 //                reservationRequestDTO.getNumberOfSeats(),
 //                reservationRequestDTO.getSeatType(),
 //                bookedSeats
 //        );
-//
+
 //        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
 //
 //        if (availableSeats.isEmpty()){
@@ -484,15 +470,12 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
-        if (_currentAuthUser == null) {
-            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
-        }
         Client client = ClientBuilder.newClient();
 
         authenticateUser();
 
         //TODO make this user name of current user
-        String userURI = USER_WEB_SERVICE_URI + "/" + _currentAuthUser.getUserName();
+        String userURI = USER_WEB_SERVICE_URI + "/" + null;
 
         Invocation.Builder builder = client.target(userURI).request()
                 .accept(MediaType.APPLICATION_XML);
@@ -528,11 +511,15 @@ public class DefaultService implements ConcertService {
     public Set<BookingDTO> getBookings() throws ServiceException {
         Client client = ClientBuilder.newClient();
 
+
+
         // Make an invocation on a Concert URI and specify XML as the data return type
         Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
                 .accept(MediaType.APPLICATION_XML);
 
-        Response response = builder.get();
+        //TODO use token
+        Response response = builder.put(Entity.entity(null,
+                MediaType.APPLICATION_XML));
         checkForServerError(response);
 
         Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {});

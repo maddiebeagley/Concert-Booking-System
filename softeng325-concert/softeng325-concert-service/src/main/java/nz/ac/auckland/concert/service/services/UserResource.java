@@ -13,6 +13,7 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_XML)
@@ -20,32 +21,32 @@ import java.util.List;
 public class UserResource {
 
     @POST
-    public Response createUser(UserDTO newUser) {
-        // check that all required fields have been set
-        if (newUser.getUserName() == null ||
-                newUser.getPassword() == null ||
-                newUser.getFirstName() == null ||
-                newUser.getLastName() == null) {
-            return Response.status(Response.Status.PARTIAL_CONTENT).build();
-        }
-
+    public Response createUser(UserDTO newUserDTO) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         //checks that there are no other users with this username
         em.getTransaction().begin();
-        User user = em.find(User.class, newUser.getUserName());
+        User user = em.find(User.class, newUserDTO.getUserName());
 
+        //a user has been found with the input username, ie username is not unique
         if (user != null) {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
 
         // code will only reach here and commit the desired new user if all criteria are met
-        em.persist(UserMapper.toDomain(newUser));
+        //a cookie is generated with a unique ID and assigned to the user
+        NewCookie newCookie = new NewCookie("token", UUID.randomUUID().toString());
+        User newUser = UserMapper.toDomain(newUserDTO);
+        newUser.setToken(newCookie.getValue());
+
+        //new user is written to the DB
+        em.persist(newUser);
         em.getTransaction().commit();
 
         try {
-            URI uri = new URI("/users/" + newUser.getUserName());
-            return Response.ok().location(uri).build();
+            //stores the URI location of the new user in the response
+            URI uri = new URI("/users/" + newUserDTO.getUserName());
+            return Response.created(uri).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return Response.serverError().build();
@@ -77,9 +78,43 @@ public class UserResource {
         }
     }
 
+    @POST
+    public Response authenticateUser(UserDTO userDTO) {
+
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+
+            em.getTransaction().begin();
+            User user = em.find(User.class, userDTO.getUserName());
+
+            //there is no user with the specified user name
+            if (user == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            String dbPassword = user.getPassword();
+            String inputPassWord = userDTO.getPassword();
+
+            //check that supplied password matches password in DB
+            if (!dbPassword.equals(inputPassWord)){
+                return Response.status(Response.Status.EXPECTATION_FAILED).build();
+            }
+
+            em.getTransaction().commit();
+
+            //return the userDTO corresponding to DB user with all fields populated
+            return Response.ok(UserMapper.toDTO(user)).build();
+
+        } finally {
+            em.close();
+        }
+    }
+
+
     @GET
     @Path("{userName}")
-    public Response getUser(@PathParam("userName") String userName) {
+    public Response authenticateUser(@PathParam("userName") String userName) {
 
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
@@ -88,9 +123,11 @@ public class UserResource {
             em.getTransaction().begin();
             User user = em.find(User.class, userName);
 
+            //there is no user with the specified user name
             if (user == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+
 
             em.getTransaction().commit();
 
@@ -129,4 +166,5 @@ public class UserResource {
         }
 
     }
+
 }
