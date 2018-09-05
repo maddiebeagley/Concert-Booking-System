@@ -9,10 +9,10 @@ import javax.persistence.*;
  * DTO class to represent users. 
  * 
  * A UserDTO describes a user in terms of:
- * _username  the user's unique username.
+ * _userName  the user's unique userName.
  * _password  the user's password.
- * _firstname the user's first name.
- * _lastname  the user's family name.
+ * _firstName the user's first Name.
+ * _lastName  the user's family Name.
  *
  */
 @Entity
@@ -20,48 +20,48 @@ import javax.persistence.*;
 public class User {
 
 	@Id
-	@Column(name = "row")
-	private String _username;
+	@Column(name = "userName", nullable = false)
+	private String _userName;
 
 	@Column(nullable = false, name = "password")
 	private String _password;
 
-	@Column(nullable = false, name = "firstname")
-	private String _firstname;
+	@Column(nullable = false, name = "firstName")
+	private String _firstName;
 
-	@Column(nullable = false, name = "lastname")
-	private String _lastname;
+	@Column(nullable = false, name = "lastName")
+	private String _lastName;
 
 	@Column(name = "creditCard")
 	private CreditCard _creditCard;
 
 	protected User() {}
 
-	public User(String username, String password, String lastname, String firstname) {
-		_username = username;
+	public User(String userName, String password, String lastName, String firstName) {
+		_userName = userName;
 		_password = password;
-		_lastname = lastname;
-		_firstname = firstname;
+		_lastName = lastName;
+		_firstName = firstName;
 	}
 
-	public User(String username, String password) {
-		this(username, password, null, null);
+	public User(String userName, String password) {
+		this(userName, password, null, null);
 	}
 	
-	public String getUsername() {
-		return _username;
+	public String getUserName() {
+		return _userName;
 	}
 	
 	public String getPassword() {
 		return _password;
 	}
 	
-	public String getFirstname() {
-		return _firstname;
+	public String getFirstName() {
+		return _firstName;
 	}
 	
-	public String getLastname() {
-		return _lastname;
+	public String getLastName() {
+		return _lastName;
 	}
 
 	public CreditCard getCreditCard() {
@@ -70,6 +70,14 @@ public class User {
 
 	public void setCreditCard(CreditCard creditCard) {
 		_creditCard = creditCard;
+	}
+
+	public void setFirstName(String _firstName) {
+		this._firstName = _firstName;
+	}
+
+	public void setLastName(String _lastName) {
+		this._lastName = _lastName;
 	}
 
 	@Override
@@ -81,10 +89,10 @@ public class User {
 
         User rhs = (User) obj;
         return new EqualsBuilder().
-            append(_username, rhs._username).
+            append(_userName, rhs._userName).
             append(_password, rhs._password).
-            append(_firstname, rhs._firstname).
-            append(_lastname, rhs._lastname).
+            append(_firstName, rhs._firstName).
+            append(_lastName, rhs._lastName).
             append(_creditCard, rhs._creditCard).
             isEquals();
 	}
@@ -92,9 +100,9 @@ public class User {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31). 
-	            append(_username).
+	            append(_userName).
 	            append(_password).
-	            append(_firstname).
+	            append(_firstName).
 	            append(_password).
 	            append(_creditCard).
 	            hashCode();

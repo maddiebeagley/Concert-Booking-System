@@ -9,59 +9,66 @@ import javax.xml.bind.annotation.*;
  * DTO class to represent users. 
  * 
  * A UserDTO describes a user in terms of:
- * _username  the user's unique username.
+ * _userName  the user's unique userName.
  * _password  the user's password.
- * _firstname the user's first name.
- * _lastname  the user's family name.
+ * _firstName the user's first Name.
+ * _lastName  the user's family Name.R
  *
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserDTO {
 
-//	@XmlID
-	@XmlAttribute(name="username")
-	private String _username;
+	@XmlAttribute(name="userName")
+	private String _userName;
 
 	@XmlAttribute(name="password")
 	private String _password;
 
-	@XmlAttribute(name="firstname")
-	private String _firstname;
+	@XmlAttribute(name="firstName")
+	private String _firstName;
 
-	@XmlAttribute(name="lastname")
-	private String _lastname;
+	@XmlAttribute(name="lastName")
+	private String _lastName;
 	
 	protected UserDTO() {}
 	
-	public UserDTO(String username, String password, String lastname, String firstname) {
-		_username = username;
+	public UserDTO(String userName, String password, String lastName, String firstName) {
+		_userName = userName;
 		_password = password;
-		_lastname = lastname;
-		_firstname = firstname;
+		_lastName = lastName;
+		_firstName = firstName;
 	}
 	
-	public UserDTO(String username, String password) {
-		this(username, password, null, null);
+	public UserDTO(String userName, String password) {
+		this(userName, password, null, null);
 	}
 	
-	public String getUsername() {
-		return _username;
+	public String getUserName() {
+		return _userName;
 	}
 	
 	public String getPassword() {
 		return _password;
 	}
 	
-	public String getFirstname() {
-		return _firstname;
+	public String getFirstName() {
+		return _firstName;
 	}
 	
-	public String getLastname() {
-		return _lastname;
+	public String getLastName() {
+		return _lastName;
 	}
-	
-	@Override
+
+    public void setFirstName(String _firstName) {
+        this._firstName = _firstName;
+    }
+
+    public void setLastName(String _lastName) {
+        this._lastName = _lastName;
+    }
+
+    @Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof UserDTO))
             return false;
@@ -70,19 +77,19 @@ public class UserDTO {
 
         UserDTO rhs = (UserDTO) obj;
         return new EqualsBuilder().
-            append(_username, rhs._username).
+            append(_userName, rhs._userName).
             append(_password, rhs._password).
-            append(_firstname, rhs._firstname).
-            append(_lastname, rhs._lastname).
+            append(_firstName, rhs._firstName).
+            append(_lastName, rhs._lastName).
             isEquals();
 	}
 	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31). 
-	            append(_username).
+	            append(_userName).
 	            append(_password).
-	            append(_firstname).
+	            append(_firstName).
 	            append(_password).
 	            hashCode();
 	}

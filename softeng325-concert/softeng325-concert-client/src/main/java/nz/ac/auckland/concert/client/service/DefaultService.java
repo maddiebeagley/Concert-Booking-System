@@ -183,47 +183,45 @@ public class DefaultService implements ConcertService {
      *
      */
     @Override
-    public UserDTO authenticateUser(UserDTO user) throws ServiceException {
+    public UserDTO authenticateUser(UserDTO inputUserDTO) throws ServiceException {
         Client client = ClientBuilder.newClient();
 
         //ensures both username and password have been set
-        if (user.getUsername() == null || user.getPassword() == null) {
+        if (inputUserDTO.getUserName() == null || inputUserDTO.getPassword() == null) {
             throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
         }
 
+        String userURI = USER_WEB_SERVICE_URI + "/" + inputUserDTO.getUserName();
+
         // retrieve all users from DB to check their username fields
-        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
+        Invocation.Builder builder = client.target(userURI).request().accept(MediaType.APPLICATION_XML);
         Response response = builder.get();
-        Set<UserDTO> userDTOS = response.readEntity(new GenericType<Set<UserDTO>>() {});
 
-        //ensures there has been no error when communicating with the server
-        if (response.getStatus() == 500) {
-            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
-        }
-
-        boolean userNameSet = false;
-        String dbPassword = null;
-
-        //verifies that username of given user is in the DB
-        for (UserDTO userDTO : userDTOS) {
-            if (userDTO.getUsername().equals(user.getUsername())){
-                userNameSet = true;
-                dbPassword = userDTO.getPassword();
-                break;
-            }
-        }
-
-        //throws exeception if the user is not stored in the DB
-        if (!userNameSet){
+        //there is no user with the given username
+        if (response.getEntity() == null){
             throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
         }
 
-        //checks that given password matches that of the DB
-        if (!user.getPassword().equals(dbPassword)){
+        //ensures there has been no error when communicating with the server
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+        }
+
+
+        UserDTO DBUserDTO = response.readEntity(UserDTO.class);
+
+        //check if supplied password matches the password stored in the DB
+        if (!DBUserDTO.getPassword().equals(inputUserDTO.getPassword())) {
             throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
         }
 
-        return user;
+        //set the remaining fields of the DTO object
+        inputUserDTO.setFirstName(DBUserDTO.getFirstName());
+        inputUserDTO.setLastName(DBUserDTO.getLastName());
+
+        System.out.println("output DTO User from authenticateUser method: " + inputUserDTO.toString());
+
+        return inputUserDTO;
     }
 
     /**

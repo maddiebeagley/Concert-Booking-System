@@ -5,6 +5,7 @@ import nz.ac.auckland.concert.common.dto.CreditCardDTO;
 import nz.ac.auckland.concert.common.dto.UserDTO;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.service.domain.jpa.Booking;
+import nz.ac.auckland.concert.service.domain.jpa.Performer;
 import nz.ac.auckland.concert.service.domain.jpa.User;
 import nz.ac.auckland.concert.service.mappers.BookingMapper;
 import nz.ac.auckland.concert.service.mappers.CreditCardMapper;
@@ -31,32 +32,29 @@ public class UserResource {
     @POST
     public Response createUser(UserDTO newUser) {
         // check that all required fields have been set
-        if (newUser.getUsername() == null ||
+        if (newUser.getUserName() == null ||
                 newUser.getPassword() == null ||
-                newUser.getFirstname() == null ||
-                newUser.getLastname() == null) {
+                newUser.getFirstName() == null ||
+                newUser.getLastName() == null) {
             return Response.status(Response.Status.PARTIAL_CONTENT).build();
         }
 
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
-        //find all users to check that given username is unique
-        TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
-        List<User> users = query.getResultList();
+        //checks that there are no other users with this username
+        em.getTransaction().begin();
+        User user = em.find(User.class, newUser.getUserName());
 
-        for (User user : users) {
-            if (user.getUsername().equals(newUser.getUsername())){
-                return Response.status(Response.Status.EXPECTATION_FAILED).build();
-            }
+        if (user != null) {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
 
         // code will only reach here and commit the desired new user if all criteria are met
-        em.getTransaction().begin();
         em.persist(UserMapper.toDomain(newUser));
         em.getTransaction().commit();
 
         try {
-            URI uri = new URI("/users/" + newUser.getUsername());
+            URI uri = new URI("/users/" + newUser.getUserName());
             return Response.ok().location(uri).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -77,7 +75,8 @@ public class UserResource {
 
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
             List<UserDTO> userDTOS = UserMapper.toDTOList(query.getResultList());
-            GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {};
+            GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {
+            };
 
             em.getTransaction().commit();
 
@@ -88,10 +87,35 @@ public class UserResource {
         }
     }
 
+    @GET
+    @Path("{userName}")
+    public Response getUser(@PathParam("userName") String userName) {
+
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+
+            em.getTransaction().begin();
+            User user = em.find(User.class, userName);
+
+            if (user == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            em.getTransaction().commit();
+
+            UserDTO userDTO = UserMapper.toDTO(user);
+            return Response.ok(userDTO).build();
+
+        } finally {
+            em.close();
+        }
+    }
+
 
     @PUT
     @Path("{username}")
-    public Response addCreditCard(@PathParam("username") String userName, CreditCardDTO creditCardDTO){
+    public Response addCreditCard(@PathParam("username") String userName, CreditCardDTO creditCardDTO) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {

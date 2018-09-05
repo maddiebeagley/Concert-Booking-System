@@ -10,17 +10,17 @@ public class UserMapper {
 
     public static User toDomain(UserDTO userDTO) {
         return new User(
-                userDTO.getUsername(),
+                userDTO.getUserName(),
                 userDTO.getPassword(),
-                userDTO.getFirstname(),
-                userDTO.getLastname());
+                userDTO.getFirstName(),
+                userDTO.getLastName());
     }
 
     public static UserDTO toDTO(User user) {
-        return new UserDTO(user.getUsername(),
+        return new UserDTO(user.getUserName(),
                 user.getPassword(),
-                user.getLastname(),
-                user.getFirstname());
+                user.getLastName(),
+                user.getFirstName());
     }
 
     public static List<UserDTO> toDTOList(List<User> users) {
