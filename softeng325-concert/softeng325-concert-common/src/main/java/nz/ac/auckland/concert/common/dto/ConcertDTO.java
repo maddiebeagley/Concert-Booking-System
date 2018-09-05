@@ -92,6 +92,7 @@ public class ConcertDTO {
 
         ConcertDTO rhs = (ConcertDTO) obj;
         return new EqualsBuilder().
+            append(_id, rhs._id).
             append(_title, rhs._title).
             append(_dates, rhs._dates).
             append(_tariff, rhs._tariff).
@@ -102,6 +103,7 @@ public class ConcertDTO {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31). 
+	            append(_id).
 	            append(_title).
 	            append(_dates).
 	            append(_tariff).

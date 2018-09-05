@@ -24,31 +24,37 @@ import java.util.*;
  *
  */
 @Entity
+@Table(name = "CONCERTS")
 public class Concert {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "id")
+	@Column(name = "id", nullable = false, unique = true)
 	private Long _id;
 
-	@Column(name = "title")
+	@Column(name = "title", nullable = false)
 	private String _title;
 
+	@ElementCollection
+	@CollectionTable(name = "CONCERT_DATES", joinColumns = @JoinColumn(name="id"))
 	@Column(name = "dates")
-	@Convert(converter=LocalDateTimeConverter.class)
-	private Set<LocalDateTime> _dates;
+	private Set<LocalDateTime> _dates = new HashSet<LocalDateTime>();
 
 	@ElementCollection
-	@JoinTable(name = "CONCERT_TARIFS", joinColumns = @JoinColumn(name = "_id"))
+	@JoinTable(name = "CONCERT_TARIFS",
+			joinColumns = @JoinColumn(name = "concertId"))
 	@MapKeyColumn(name = "price_band")
 	@Column(name = "tariff", nullable = false)
 	@MapKeyEnumerated(EnumType.STRING)
-	private Map<PriceBand, BigDecimal> _tariff;
+	private Map<PriceBand, BigDecimal> _tariff = new HashMap<PriceBand, BigDecimal>();
 
 	@ManyToMany
 	@ElementCollection
-	@Column(name = "performers")
-	private Set<Performer> _performers = new HashSet<>();
+	@JoinTable(name = "CONCERT_PERFORMER",
+			joinColumns = @JoinColumn(name = "concertId"),
+			inverseJoinColumns = @JoinColumn(name = "performerId"))
+	@Column(name = "performer", nullable = false, unique = true)
+	private Set<Performer> _performers = new HashSet<Performer>();
 
 	public Concert() {
 	}
@@ -81,30 +87,24 @@ public class Concert {
 	public Set<Performer> getPerformers() {
 		return Collections.unmodifiableSet(_performers);
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Concert))
-            return false;
-        if (obj == this)
-            return true;
 
-        Concert rhs = (Concert) obj;
-        return new EqualsBuilder().
-            append(_title, rhs._title).
-            append(_dates, rhs._dates).
-            append(_tariff, rhs._tariff).
-            append(_performers, rhs._performers).
-            isEquals();
+	public void set_id(Long _id) {
+		this._id = _id;
 	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_title).
-	            append(_dates).
-	            append(_tariff).
-	            append(_performers).
-	            hashCode();
+
+	public void set_title(String _title) {
+		this._title = _title;
+	}
+
+	public void set_dates(Set<LocalDateTime> _dates) {
+		this._dates = _dates;
+	}
+
+	public void set_tariff(Map<PriceBand, BigDecimal> _tariff) {
+		this._tariff = _tariff;
+	}
+
+	public void set_performers(Set<Performer> _performers) {
+		this._performers = _performers;
 	}
 }

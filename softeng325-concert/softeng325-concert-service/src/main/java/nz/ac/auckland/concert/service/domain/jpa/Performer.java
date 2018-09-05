@@ -22,80 +22,59 @@ import java.util.Set;
  *             
  */
 @Entity
+@Table(name = "PERFORMERS")
 public class Performer {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "id")
-	private Long _id;
+	@Column(name = "performerId", nullable = false)
+	private Long _performerId;
 
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	private String _name;
 
-	@Column(name = "image")
+	@Column(name = "imageName")
 	private String _imageName;
 
-	@Enumerated
+	@Enumerated(EnumType.STRING)
 	@Column(name = "genre")
 	private Genre _genre;
 
 	@ManyToMany
+	@JoinTable(name = "CONCERT_PERFORMER",
+			joinColumns = @JoinColumn(name = "performerId"),
+			inverseJoinColumns = @JoinColumn(name = "concertId"))
 	@Column(name = "concerts")
 	private Set<Concert> _concerts = new HashSet<>();
 
-	public Performer() {}
+	public Performer() {
+	}
 
 	public Performer(Long id, String name, String image, Genre genre, Set<Concert> concerts) {
-		_id = id;
+		_performerId = id;
 		_name = name;
 		_imageName = image;
 		_genre = genre;
 		_concerts = new HashSet<Concert>(concerts);
 	}
-	
-	public Long getId() {
-		return _id;
+
+	public Long getPerformerId() {
+		return _performerId;
 	}
-	
+
 	public String getName() {
 		return _name;
 	}
-	
-	public String getImage() {
+
+	public String getImageName() {
 		return _imageName;
 	}
-	
+
 	public Set<Concert> getConcerts() {
 		return Collections.unmodifiableSet(_concerts);
 	}
 
-    public Genre getGenre() {
-        return _genre;
-    }
-
-    @Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Performer))
-            return false;
-        if (obj == this)
-            return true;
-
-        Performer rhs = (Performer) obj;
-        return new EqualsBuilder().
-            append(_name, rhs._name).
-            append(_imageName, rhs._imageName).
-            append(_genre, rhs._genre).
-            append(_concerts, rhs._concerts).
-            isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 31). 
-	            append(_name).
-	            append(_imageName).
-	            append(_genre).
-	            append(_concerts).
-	            hashCode();
+	public Genre getGenre() {
+		return _genre;
 	}
 }

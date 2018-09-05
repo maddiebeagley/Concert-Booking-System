@@ -29,7 +29,7 @@ public class ConcertMapper {
         }
 
         for (Performer performer : concert.getPerformers()) {
-            performerIds.add(performer.getId());
+            performerIds.add(performer.getPerformerId());
         }
 
         return new ConcertDTO(concert.getId(),

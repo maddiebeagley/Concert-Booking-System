@@ -30,6 +30,9 @@ public class Booking {
 
 	@Id
 	@GeneratedValue
+	@Column(name = "id")
+	private Long _id;
+
 	@Column(name = "concertId")
 	private Long _concertId;
 
@@ -90,7 +93,8 @@ public class Booking {
 			return true;
 
 		Booking rhs = (Booking) obj;
-		return new EqualsBuilder().append(_concertId, rhs._concertId)
+		return new EqualsBuilder()
+				.append(_concertId, rhs._concertId)
 				.append(_concertTitle, rhs._concertTitle)
 				.append(_dateTime, rhs._dateTime)
 				.append(_seats, rhs._seats)

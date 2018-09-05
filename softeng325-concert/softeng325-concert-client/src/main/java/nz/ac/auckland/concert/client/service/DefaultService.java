@@ -1,5 +1,16 @@
 package nz.ac.auckland.concert.client.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.service.domain.jpa.*;
@@ -16,11 +27,22 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public class DefaultService implements ConcertService {
 
+    // AWS information to access performer images.
+    private static final String AWS_ACCESS_KEY_ID = "AKIAJOG7SJ36SFVZNJMQ";
+    private static final String AWS_SECRET_ACCESS_KEY = "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";
+    private static final String AWS_BUCKET = "concert2.aucklanduni.ac.nz";
+
+    // URLS to access resources
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
     private static String RESERVATION_WEB_SERVICE_URI = "http://localhost:10000/services/reservations";
     private static String PERFORMER_WEB_SERVICE_URI = "http://localhost:10000/services/performers";
@@ -166,7 +188,7 @@ public class DefaultService implements ConcertService {
 
         //ensures both username and password have been set
         if (user.getUsername() == null || user.getPassword() == null) {
-            throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
+            throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
         }
 
         // retrieve all users from DB to check their username fields
@@ -234,23 +256,93 @@ public class DefaultService implements ConcertService {
 
         Response response = builder.get();
 
-        //verfies that server communication was correctly executed.
-        if (response.getStatus() == 500) {
+        //verifies that server communication was correctly executed.
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            //retrieves image from performer
+            Performer performer = response.readEntity(Performer.class);
+            String imageName = performer.getImageName();
+
+            //checks that performer image is not null
+            if (imageName == null) {
+                throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+            } else {
+                BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
+                        AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
+                AmazonS3 s3 = AmazonS3ClientBuilder
+                        .standard()
+                        .withRegion(Regions.AP_SOUTHEAST_2)
+                        .withCredentials(
+                                new AWSStaticCredentialsProvider(awsCredentials))
+                        .build();
+
+                // Download the images.
+//                return download(s3, imageName);
+                //TODO configure download method
+
+                return null;
+            }
+
+        } else {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
+    }
 
-        //retrieves image from performer
-        Performer performer = response.readEntity(Performer.class);
-        String image = performer.getImage();
 
-        //checks that performer image is not null
-        if (image == null) {
-            throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+    /**
+     * Downloads images in the bucket named AWS_BUCKET.
+     *
+     * @param s3         the AmazonS3 connection.
+     * @param imageName the named image to download.
+     */
+    private static Image download(AmazonS3 s3, String imageName) {
+//
+//        File downloadDirectory = new File(DOWNLOAD_DIRECTORY);
+//        System.out.println("Will download " + imageName.size() + " files to: " + downloadDirectory.getPath());
+//
+//        TransferManager mgr = TransferManagerBuilder
+//                .standard()
+//                .withS3Client(s3)
+//                .build();
+//
+//        File imageFile = new File(downloadDirectory, imageName);
+//
+//        if (imageFile.exists()) {
+//            imageFile.delete();
+//        }
+//
+//            try {
+//                S3Object o = s3.getObject(AWS_BUCKET, AWS_SECRET_ACCESS_KEY);
+//                S3ObjectInputStream s3is = o.getObjectContent();
+//                FileOutputStream fos = new FileOutputStream(new File(AWS_SECRET_ACCESS_KEY));
+//                byte[] read_buf = new byte[1024];
+//                int read_len = 0;
+//                while ((read_len = s3is.read(read_buf)) > 0) {
+//                    fos.write(read_buf, 0, read_len);
+//                }
+//                s3is.close();
+//                fos.close();
+//            } catch (AmazonServiceException e) {
+//                System.err.println(e.getErrorMessage());
+//                System.exit(1);
+//            } catch (FileNotFoundException e) {
+//                System.err.println(e.getMessage());
+//                System.exit(1);
+//            } catch (IOException e) {
+//                System.err.println(e.getMessage());
+//                System.exit(1);
+//            }
+
+//
+//            System.out.print("Downloading " + imageName + "... ");
+//            GetObjectRequest req = new GetObjectRequest(AWS_BUCKET, imageName);
+//            Image image = s3.getObject(req, imageFile);
+//            s3.getObject();
+//            System.out.println("Complete!");
+
+            //TODO remove placeholder
+            return null;
         }
 
-        //TODO retrieve Image
-        return null;
-    }
 
     //TODO THIS LOL.
     /**

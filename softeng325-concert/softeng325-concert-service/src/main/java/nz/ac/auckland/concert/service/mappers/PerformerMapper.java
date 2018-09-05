@@ -25,7 +25,7 @@ public class PerformerMapper {
 
         //TODO FIX IMAGE NAME
         return new PerformerDTO(
-                performer.getId(),
+                performer.getPerformerId(),
                 performer.getName(),
                 "image",
                 performer.getGenre(),
