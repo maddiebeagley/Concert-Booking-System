@@ -224,6 +224,7 @@ public class DefaultService implements ConcertService {
 
         System.out.println("output DTO User from authenticateUser method: " + inputUserDTO.toString());
 
+        _currentAuthUser = inputUserDTO;
         return inputUserDTO;
     }
 
@@ -386,6 +387,10 @@ public class DefaultService implements ConcertService {
     @Override
     public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequestDTO) throws ServiceException {
 
+        if (_currentAuthUser == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
+
         Client client = ClientBuilder.newClient();
 
         //verifies that all required fields are not null
@@ -532,12 +537,15 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
+        if (_currentAuthUser == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
         Client client = ClientBuilder.newClient();
 
         authenticateUser();
 
         //TODO make this user name of current user
-        String userURI = USER_WEB_SERVICE_URI + "/Bulldog";
+        String userURI = USER_WEB_SERVICE_URI + "/" + _currentAuthUser.getUserName();
 
         Invocation.Builder builder = client.target(userURI).request()
                 .accept(MediaType.APPLICATION_XML);
