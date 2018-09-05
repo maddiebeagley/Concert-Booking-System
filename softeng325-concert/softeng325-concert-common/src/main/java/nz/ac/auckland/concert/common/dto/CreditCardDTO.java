@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * _expiryDate the credit card's expiry date. 
  *
  */
+@XmlRootElement
 public class CreditCardDTO {
 
 	public enum Type {Visa, Master};

@@ -131,17 +131,11 @@ public class DefaultService implements ConcertService {
 
         Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request();
 
-        //generate a new UserDTO with required information
-        UserDTO userDTO = new UserDTO(newUser.getUsername(),
-                newUser.getPassword(),
-                newUser.getLastname(),
-                newUser.getFirstname());
-
-        Response response = builder.post(Entity.entity(userDTO,
+        Response response = builder.post(Entity.entity(newUser,
                 MediaType.APPLICATION_XML));
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()){
-            return userDTO;
+            return newUser;
             //TODO authorise new user
         } else if (response.getStatus() == Response.Status.PARTIAL_CONTENT.getStatusCode()) {
             throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
@@ -157,7 +151,7 @@ public class DefaultService implements ConcertService {
      * Attempts to authenticate an existing user and log them into the remote
      * service.
      *
-     * @param user stores the user's authentication credentials. Properties
+     * @param inputUserDTO stores the user's authentication credentials. Properties
      * username and password must be set.
      *
      * @return a UserDTO whose properties are all set.
@@ -198,7 +192,7 @@ public class DefaultService implements ConcertService {
         Response response = builder.get();
 
         //there is no user with the given username
-        if (response.getEntity() == null){
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
             throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
         }
 
@@ -216,8 +210,12 @@ public class DefaultService implements ConcertService {
         }
 
         //set the remaining fields of the DTO object
-        inputUserDTO.setFirstName(DBUserDTO.getFirstName());
-        inputUserDTO.setLastName(DBUserDTO.getLastName());
+        if (inputUserDTO.getFirstName() == null) {
+            inputUserDTO.setFirstName(DBUserDTO.getFirstName());
+        }
+        if (inputUserDTO.getLastName() == null) {
+            inputUserDTO.setLastName(DBUserDTO.getLastName());
+        }
 
         System.out.println("output DTO User from authenticateUser method: " + inputUserDTO.toString());
 
@@ -342,7 +340,6 @@ public class DefaultService implements ConcertService {
         }
 
 
-    //TODO THIS LOL.
     /**
      * Attempts to reserve seats for a concert. The reservation is valid for a
      * short period that is determine by the remote service.
@@ -398,24 +395,24 @@ public class DefaultService implements ConcertService {
 
         //retrieve the concert to reserve tickets for from the DB
         Long concertId = reservationRequestDTO.getConcertId();
-        String concertURL = CONCERT_WEB_SERVICE_URI + "/" + concertId;
+        String concertURI = CONCERT_WEB_SERVICE_URI + "/" + concertId;
 
-        Invocation.Builder builder = client.target(concertURL).request()
+        Invocation.Builder builder = client.target(concertURI).request()
                 .accept(MediaType.APPLICATION_XML);
 
         Response response = builder.get();
 
         //Checks communication with server was as expected
-        if (response.getStatus() == 500) {
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
 
-        Concert concert = response.readEntity(Concert.class);
+        ConcertDTO concertDTO = response.readEntity(ConcertDTO.class);
 
         //check that the reservation date matches a date of the concert
         boolean validDate = false;
 
-        for (LocalDateTime date : concert.getDates()) {
+        for (LocalDateTime date : concertDTO.getDates()) {
             if (date.equals(reservationRequestDTO.getDate())){
                 validDate = true;
                 break;
@@ -431,37 +428,46 @@ public class DefaultService implements ConcertService {
         Invocation.Builder bookingBuilder = client.target(bookingURL).request()
                 .accept(MediaType.APPLICATION_XML);
 
-        Response bookingResponse = builder.get();
+        Response bookingResponse = bookingBuilder.get();
 
-        Set<Seat> bookedSeats = bookingResponse.readEntity(new GenericType<Set<Seat>>() {});
-
-        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
-                reservationRequestDTO.getNumberOfSeats(),
-                reservationRequestDTO.getSeatType(),
-                SeatMapper.toDTOSet(bookedSeats)
-        );
-
-        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
-
-        if (availableSeats.isEmpty()){
-            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
-        } else{
-
-            ReservationRequest reservationRequest = ReservationMapper.toRequestDomain(reservationRequestDTO);
-
-            Reservation reservation = new Reservation(reservationRequest, availableSeats);
-            Invocation.Builder reservationBuilder = client.target(RESERVATION_WEB_SERVICE_URI).request()
-                    .accept(MediaType.APPLICATION_XML);
-
-            Response reservationResponse = reservationBuilder.post(Entity.entity(reservation,
-                    MediaType.APPLICATION_XML));
-
-            if (reservationResponse.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
-                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
-            }
-
-            return ReservationMapper.toDTO(reservation);
+        if (bookingResponse.getStatus() != Response.Status.OK.getStatusCode()){
+            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
+
+        Set<BookingDTO> bookingDTOs = bookingResponse.readEntity(new GenericType<Set<BookingDTO>>() {});
+
+//        Set<SeatDTO> bookedSeats = bookingDTO.getSeats();
+//
+        //TODO use methods properly! need to book a subset of available seats!
+//        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
+//                reservationRequestDTO.getNumberOfSeats(),
+//                reservationRequestDTO.getSeatType(),
+//                bookedSeats
+//        );
+//
+//        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
+//
+//        if (availableSeats.isEmpty()){
+//            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
+//        } else{
+//
+//            ReservationRequest reservationRequest = ReservationMapper.toRequestDomain(reservationRequestDTO);
+//
+//            Reservation reservation = new Reservation(reservationRequest, availableSeats);
+//            Invocation.Builder reservationBuilder = client.target(RESERVATION_WEB_SERVICE_URI).request()
+//                    .accept(MediaType.APPLICATION_XML);
+//
+//            Response reservationResponse = reservationBuilder.post(Entity.entity(reservation,
+//                    MediaType.APPLICATION_XML));
+//
+//            if (reservationResponse.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
+//                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+//            }
+//
+//            return ReservationMapper.toDTO(reservation);
+//        }
+
+        return null;
     }
 
     /**
@@ -522,14 +528,17 @@ public class DefaultService implements ConcertService {
     @Override
     public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
         Client client = ClientBuilder.newClient();
+
         authenticateUser();
 
-        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request()
+        //TODO make this user name of current user
+        String userURI = USER_WEB_SERVICE_URI + "/Bulldog";
+
+        Invocation.Builder builder = client.target(userURI).request()
                 .accept(MediaType.APPLICATION_XML);
 
         Response response = builder.put(Entity.entity(creditCard,
                 MediaType.APPLICATION_XML));
-
 
         if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);

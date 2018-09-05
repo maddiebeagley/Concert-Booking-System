@@ -20,7 +20,7 @@ public class BookingResource {
 
     @GET
     @Path("{priceBand}")
-    public Response getBookingFromPriceBand(@PathParam("priceBand") String priceBandValue){
+    public Response getBookingFromPriceBand(@PathParam("priceBand") PriceBand priceBandValue){
         // Acquire an EntityManager (creating a new persistence context).
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
@@ -29,7 +29,7 @@ public class BookingResource {
             em.getTransaction().begin();
 
             TypedQuery<Booking> query = em.createQuery(
-                    "SELECT b FROM Booking b WHERE b.PRICE_BAND = :priceBand", Booking.class)
+                    "SELECT b FROM Booking b WHERE b.priceBand = :priceBand", Booking.class)
                     .setParameter("priceBand", priceBandValue);
 
             List<BookingDTO> bookingDTOs = BookingMapper.toDTOList(query.getResultList());

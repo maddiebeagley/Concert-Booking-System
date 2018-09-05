@@ -26,12 +26,13 @@ public class ConcertResource {
         try {
             // Start a new transaction.
             em.getTransaction().begin();
-            ConcertDTO concertDTO = ConcertMapper.toDTO(em.find(Concert.class, id));
+            Concert concert = em.find(Concert.class, id);
             em.getTransaction().commit();
 
-            if (concertDTO == null) {
+            if (concert == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else {
+                ConcertDTO concertDTO = ConcertMapper.toDTO(concert);
                 return Response.ok(concertDTO).build();
             }
         } finally {

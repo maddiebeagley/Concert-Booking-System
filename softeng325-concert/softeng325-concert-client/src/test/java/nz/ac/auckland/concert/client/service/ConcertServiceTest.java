@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -170,7 +171,7 @@ public class ConcertServiceTest {
 			
 			UserDTO credentials = new UserDTO("Bulldog", "123");
 			UserDTO filledDTO = _service.authenticateUser(credentials);
-			
+
 			assertEquals(userDTO, filledDTO);
 		} catch(ServiceException e) {
 			fail();
@@ -223,12 +224,12 @@ public class ConcertServiceTest {
 			
 			UserDTO userDTO = new UserDTO("Bulldog", "123", "Churchill", "Winston");
 			_service.createUser(userDTO);
-			
+
 			LocalDateTime dateTime = LocalDateTime.of(2017, 2, 24, 17, 00);
 			ReservationRequestDTO request = new ReservationRequestDTO(numberOfSeatsToBook, PriceBand.PriceBandC, 1L, dateTime);
-			
+
 			ReservationDTO reservation = _service.reserveSeats(request);
-			
+
 			ReservationRequestDTO requestFromResponse = reservation.getReservationRequest();
 			assertEquals(request, requestFromResponse);
 			

@@ -1,28 +1,18 @@
 package nz.ac.auckland.concert.service.services;
 
-import nz.ac.auckland.concert.common.dto.BookingDTO;
 import nz.ac.auckland.concert.common.dto.CreditCardDTO;
 import nz.ac.auckland.concert.common.dto.UserDTO;
-import nz.ac.auckland.concert.common.message.Messages;
-import nz.ac.auckland.concert.service.domain.jpa.Booking;
-import nz.ac.auckland.concert.service.domain.jpa.Performer;
 import nz.ac.auckland.concert.service.domain.jpa.User;
-import nz.ac.auckland.concert.service.mappers.BookingMapper;
 import nz.ac.auckland.concert.service.mappers.CreditCardMapper;
 import nz.ac.auckland.concert.service.mappers.UserMapper;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_XML)
@@ -114,22 +104,23 @@ public class UserResource {
 
 
     @PUT
-    @Path("{username}")
-    public Response addCreditCard(@PathParam("username") String userName, CreditCardDTO creditCardDTO) {
+    @Path("{userName}")
+    public Response addCreditCard(@PathParam("userName") String userName, CreditCardDTO creditCardDTO) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
             em.getTransaction().begin();
 
-            User toUpdate = em.find(User.class, userName);
-            if (toUpdate == null) {
+            User user = em.find(User.class, userName);
+
+            if (user == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             //update the credit card field of the supplied user
-            toUpdate.setCreditCard(CreditCardMapper.toDomain(creditCardDTO));
+            user.setCreditCard(CreditCardMapper.toDomain(creditCardDTO));
 
             //merge and commit changes to the DB
-            em.merge(toUpdate);
+            em.merge(user);
             em.getTransaction().commit();
 
             return Response.ok().build();

@@ -43,7 +43,7 @@ public class Concert {
 	@ElementCollection
 	@JoinTable(name = "CONCERT_TARIFS",
 			joinColumns = @JoinColumn(name = "concertId"))
-	@MapKeyColumn(name = "price_band")
+	@MapKeyColumn(name = "priceBand")
 	@Column(name = "tariff", nullable = false)
 	@MapKeyEnumerated(EnumType.STRING)
 	private Map<PriceBand, BigDecimal> _tariff = new HashMap<PriceBand, BigDecimal>();

@@ -8,6 +8,8 @@ import javax.persistence.Convert;
 import javax.persistence.Embeddable;
 import java.time.LocalDate;
 
+import nz.ac.auckland.concert.common.jaxb.LocalDateAdapter;
+
 /**
  * DTO class to represent credit cards. 
  * 
@@ -33,7 +35,6 @@ public class CreditCard {
 	private String _number;
 
 	@Column(name = "expiryDate")
-	@Convert(converter=LocalDateTimeConverter.class)
 	private LocalDate _expiryDate;
 
 	public CreditCard() {}

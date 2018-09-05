@@ -47,7 +47,8 @@ public class Booking {
 	@Column(name = "seats")
 	private Set<Seat> _seats;
 
-	@Enumerated
+	@Enumerated(EnumType.STRING)
+	@Column(name = "priceBand")
 	private PriceBand _priceBand;
 
 	public Booking() {

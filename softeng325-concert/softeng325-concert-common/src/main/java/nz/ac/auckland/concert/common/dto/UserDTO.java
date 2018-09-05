@@ -70,8 +70,9 @@ public class UserDTO {
 
     @Override
 	public boolean equals(Object obj) {
+		System.out.println("******************DOING CUSTOM EQUALITY CHECK**********************");
 		if (!(obj instanceof UserDTO))
-            return false;
+			return false;
         if (obj == this)
             return true;
 
