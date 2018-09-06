@@ -135,7 +135,7 @@ public class DefaultService implements ConcertService {
 
         if (response.getStatus() == Response.Status.CREATED.getStatusCode()) { //user successfully created
             //current token is that of the newly added user
-            _token = response.getCookies().get(0);
+            _token = response.getCookies().get("token");
             return newUser;
         } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
             throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
@@ -195,6 +195,7 @@ public class DefaultService implements ConcertService {
         }
 
         userDTO = response.readEntity(UserDTO.class);
+        _token = response.getCookies().get("token");
         return userDTO;
     }
 
@@ -346,18 +347,19 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequestDTO) throws ServiceException {
-
-        Client client = ClientBuilder.newClient();
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
 
         //verifies that all required fields are not null
-        if (reservationRequestDTO.getConcertId() == null ||
-                reservationRequestDTO.getDate() == null ||
-                reservationRequestDTO.getSeatType() == null ||
-                reservationRequestDTO.getNumberOfSeats() == 0) {
+        if (reservationRequestDTO.getConcertId() == null || reservationRequestDTO.getDate() == null ||
+                reservationRequestDTO.getSeatType() == null || reservationRequestDTO.getNumberOfSeats() == 0) {
             throw new ServiceException(Messages.RESERVATION_REQUEST_WITH_MISSING_FIELDS);
         }
 
-        //TODO bad authentication token thing?
+        Client client = ClientBuilder.newClient();
+        //TODO affix cookie to request
 
         //retrieve the concert to reserve tickets for from the DB
         Long concertId = reservationRequestDTO.getConcertId();
@@ -448,8 +450,13 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public void confirmReservation(ReservationDTO reservation) throws ServiceException {
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
 
         Client client = ClientBuilder.newClient();
+        //TODO affix cookie to request
     }
 
     /**
@@ -472,18 +479,27 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
+
         Client client = ClientBuilder.newClient();
 
-        authenticateUser();
-
         //TODO make this user name of current user
-        String userURI = USER_WEB_SERVICE_URI + "/" + null;
+        String userURI = USER_WEB_SERVICE_URI + "/registerCard";
 
-        Invocation.Builder builder = client.target(userURI).request()
-                .accept(MediaType.APPLICATION_XML);
+        Invocation.Builder builder = client.target(userURI).request(MediaType.APPLICATION_XML)
+                .accept(MediaType.APPLICATION_XML).cookie(_token);
 
         Response response = builder.put(Entity.entity(creditCard,
                 MediaType.APPLICATION_XML));
+
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        } if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){
+            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+        }
 
         checkForServerError(response);
     }
@@ -511,13 +527,18 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public Set<BookingDTO> getBookings() throws ServiceException {
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
+
         Client client = ClientBuilder.newClient();
 
 
 
         // Make an invocation on a Concert URI and specify XML as the data return type
         Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
-                .accept(MediaType.APPLICATION_XML);
+                .accept(MediaType.APPLICATION_XML).cookie(_token);
 
         //TODO use token
         Response response = builder.put(Entity.entity(null,
@@ -529,17 +550,13 @@ public class DefaultService implements ConcertService {
 
     }
 
-    private void authenticateUser() {
-        //TODO make sure current user is authenticated
-    }
-
     /**
      * Checks that a response did not encounter a service error
      *
      * @param response
      */
     private void checkForServerError(Response response) {
-        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+        if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
     }

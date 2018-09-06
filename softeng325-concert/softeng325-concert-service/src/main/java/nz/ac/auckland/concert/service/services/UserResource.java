@@ -36,6 +36,7 @@ public class UserResource {
         // code will only reach here and commit the desired new user if all criteria are met
         //a cookie is generated with a unique ID and assigned to the user
         NewCookie newCookie = new NewCookie("token", UUID.randomUUID().toString());
+
         User newUser = UserMapper.toDomain(newUserDTO);
         newUser.setToken(newCookie.getValue());
 
@@ -46,7 +47,7 @@ public class UserResource {
         try {
             //stores the URI location of the new user in the response
             URI uri = new URI("/users/" + newUserDTO.getUserName());
-            return Response.created(uri).build();
+            return Response.created(uri).cookie(newCookie).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return Response.serverError().build();
@@ -141,17 +142,26 @@ public class UserResource {
 
 
     @PUT
-    @Path("{userName}")
-    public Response addCreditCard(@PathParam("userName") String userName, CreditCardDTO creditCardDTO) {
+    @Path("/registerCard")
+    public Response addCreditCard(CreditCardDTO creditCardDTO, @CookieParam("token") Cookie token) {
+
+        if (token == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
             em.getTransaction().begin();
 
-            User user = em.find(User.class, userName);
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
+                    .setParameter("tokenValue", token.getValue());
+
+            User user  = query.getSingleResult();
+
+            System.out.println("user has been found with name: " + user.getUserName());
 
             if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             //update the credit card field of the supplied user
             user.setCreditCard(CreditCardMapper.toDomain(creditCardDTO));
