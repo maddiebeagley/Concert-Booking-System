@@ -534,15 +534,11 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-
-
         // Make an invocation on a Concert URI and specify XML as the data return type
         Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
                 .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        //TODO use token
-        Response response = builder.put(Entity.entity(null,
-                MediaType.APPLICATION_XML));
+        Response response = builder.get();
         checkForServerError(response);
 
         Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {});
