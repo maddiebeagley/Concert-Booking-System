@@ -12,7 +12,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.UUID;
 
 @Path("/users")
@@ -56,29 +55,6 @@ public class UserResource {
         }
     }
 
-//    @GET
-//    public Response getAllUsers() {
-//        // Acquire an EntityManager (creating a new persistence context).
-//        EntityManager em = PersistenceManager.instance().createEntityManager();
-//
-//        try {
-//            // Start a new transaction.
-//            em.getTransaction().begin();
-//
-//            TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
-//            List<UserDTO> userDTOS = UserMapper.toDTOList(query.getResultList());
-//            GenericEntity<List<UserDTO>> ge = new GenericEntity<List<UserDTO>>(userDTOS) {
-//            };
-//
-//            em.getTransaction().commit();
-//
-//            return Response.ok(ge).build();
-//
-//        } finally {
-//            em.close();
-//        }
-//    }
-
     @POST
     @Path("/authenticate")
     public Response authenticateUser(UserDTO userDTO) {
@@ -112,35 +88,6 @@ public class UserResource {
         }
     }
 
-//
-////    @POST
-//    @Path("{userName}")
-//    public Response authenticateUser(@PathParam("userName") String userName) {
-////
-////        EntityManager em = PersistenceManager.instance().createEntityManager();
-////
-////        try {
-////
-////            em.getTransaction().begin();
-////            User user = em.find(User.class, userName);
-////
-////            //there is no user with the specified user name
-////            if (user == null) {
-////                return Response.status(Response.Status.NOT_FOUND).build();
-////            }
-////
-////
-////            em.getTransaction().commit();
-////
-////            UserDTO userDTO = UserMapper.toDTO(user);
-////            return Response.ok(userDTO).build();
-////
-////        } finally {
-////            em.close();
-////        }
-////    }
-
-
     @PUT
     @Path("/registerCard")
     public Response addCreditCard(CreditCardDTO creditCardDTO, @CookieParam("token") Cookie token) {
@@ -157,8 +104,6 @@ public class UserResource {
                     .setParameter("tokenValue", token.getValue());
 
             User user  = query.getSingleResult();
-
-            System.out.println("user has been found with name: " + user.getUserName());
 
             if (user == null) {
                 return Response.status(Response.Status.UNAUTHORIZED).build();

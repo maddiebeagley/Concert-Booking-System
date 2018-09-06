@@ -352,73 +352,82 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
         }
 
-        //verifies that all required fields are not null
+        //a request will not be generated unless all required fields are populated.
         if (reservationRequestDTO.getConcertId() == null || reservationRequestDTO.getDate() == null ||
                 reservationRequestDTO.getSeatType() == null || reservationRequestDTO.getNumberOfSeats() == 0) {
             throw new ServiceException(Messages.RESERVATION_REQUEST_WITH_MISSING_FIELDS);
         }
 
         Client client = ClientBuilder.newClient();
-        //TODO affix cookie to request
 
-        //retrieve the concert to reserve tickets for from the DB
-        Long concertId = reservationRequestDTO.getConcertId();
-        String concertURI = CONCERT_WEB_SERVICE_URI + "/" + concertId;
+        Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
+                .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        Invocation.Builder builder = client.target(concertURI).request()
-                .accept(MediaType.APPLICATION_XML);
+        Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
 
-        Response response = builder.get();
-        checkForServerError(response);
-
-        ConcertDTO concertDTO = response.readEntity(ConcertDTO.class);
-
-        if (!concertDTO.getDates().contains(reservationRequestDTO.getDate())) {
+        if (response.getStatus() == Response.Status.OK.getStatusCode()){ //reservation has successfully been created
+            ReservationDTO reservationDTO = response.readEntity(ReservationDTO.class);
+            return reservationDTO;
+        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){
+            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()){
             throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
+        } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()){
+            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
+        } else {
+            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
 
-        String bookingURL = BOOKING_WEB_SERVICE_URI + "/" + reservationRequestDTO.getSeatType();
 
-        Invocation.Builder bookingBuilder = client.target(bookingURL).request()
-                .accept(MediaType.APPLICATION_XML);
-
-        Response bookingResponse = bookingBuilder.get();
-        checkForServerError(bookingResponse);
-
-        Set<BookingDTO> bookingDTOs = bookingResponse.readEntity(new GenericType<Set<BookingDTO>>() {});
-
-//        Set<SeatDTO> bookedSeats = bookingDTO.getSeats();
-
-////        TODO use methods properly! need to book a subset of available seats!
-//        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
-//                reservationRequestDTO.getNumberOfSeats(),
-//                reservationRequestDTO.getSeatType(),
-//                bookedSeats
-//        );
-
-//        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
+//        //retrieve the concert to reserve tickets for from the DB
+//        Long concertId = reservationRequestDTO.getConcertId();
 //
-//        if (availableSeats.isEmpty()){
-//            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
-//        } else{
+//        ConcertDTO concertDTO = response.readEntity(ConcertDTO.class);
 //
-//            ReservationRequest reservationRequest = ReservationMapper.toRequestDomain(reservationRequestDTO);
-//
-//            Reservation reservation = new Reservation(reservationRequest, availableSeats);
-//            Invocation.Builder reservationBuilder = client.target(RESERVATION_WEB_SERVICE_URI).request()
-//                    .accept(MediaType.APPLICATION_XML);
-//
-//            Response reservationResponse = reservationBuilder.post(Entity.entity(reservation,
-//                    MediaType.APPLICATION_XML));
-//
-//            if (reservationResponse.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
-//                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
-//            }
-//
-//            return ReservationMapper.toDTO(reservation);
+//        if (!concertDTO.getDates().contains(reservationRequestDTO.getDate())) {
+//            throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
 //        }
-
-        return null;
+//
+//        String bookingURL = BOOKING_WEB_SERVICE_URI + "/" + reservationRequestDTO.getSeatType();
+//
+//        Invocation.Builder bookingBuilder = client.target(bookingURL).request()
+//                .accept(MediaType.APPLICATION_XML);
+//
+//        Response bookingResponse = bookingBuilder.get();
+//        checkForServerError(bookingResponse);
+//
+//        Set<BookingDTO> bookingDTOs = bookingResponse.readEntity(new GenericType<Set<BookingDTO>>() {});
+//
+////        Set<SeatDTO> bookedSeats = bookingDTO.getSeats();
+//
+//////        TODO use methods properly! need to book a subset of available seats!
+////        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
+////                reservationRequestDTO.getNumberOfSeats(),
+////                reservationRequestDTO.getSeatType(),
+////                bookedSeats
+////        );
+//
+////        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
+////
+////        if (availableSeats.isEmpty()){
+////            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
+////        } else{
+////
+////            ReservationRequest reservationRequest = ReservationMapper.toRequestDomain(reservationRequestDTO);
+////
+////            Reservation reservation = new Reservation(reservationRequest, availableSeats);
+////            Invocation.Builder reservationBuilder = client.target(RESERVATION_WEB_SERVICE_URI).request()
+////                    .accept(MediaType.APPLICATION_XML);
+////
+////            Response reservationResponse = reservationBuilder.post(Entity.entity(reservation,
+////                    MediaType.APPLICATION_XML));
+////
+////            if (reservationResponse.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
+////                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+////            }
+////
+////            return ReservationMapper.toDTO(reservation);
+////        }
     }
 
     /**
@@ -486,7 +495,6 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        //TODO make this user name of current user
         String userURI = USER_WEB_SERVICE_URI + "/registerCard";
 
         Invocation.Builder builder = client.target(userURI).request(MediaType.APPLICATION_XML)

@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
+import nz.ac.auckland.concert.common.dto.ConcertDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -49,12 +50,19 @@ public class Concert {
 	private Map<PriceBand, BigDecimal> _tariff = new HashMap<PriceBand, BigDecimal>();
 
 	@ManyToMany
-	@ElementCollection
 	@JoinTable(name = "CONCERT_PERFORMER",
 			joinColumns = @JoinColumn(name = "concertId"),
 			inverseJoinColumns = @JoinColumn(name = "performerId"))
 	@Column(name = "performer", nullable = false, unique = true)
 	private Set<Performer> _performers = new HashSet<Performer>();
+
+	public ConcertDTO convertToDTO() {
+		Set<Long> performerIDs = new HashSet<>();
+		for (Performer p : _performers) {
+			performerIDs.add(p.getPerformerId());
+		}
+		return new ConcertDTO(_id, _title, _dates, _tariff, performerIDs);
+	}
 
 	public Concert() {
 	}
