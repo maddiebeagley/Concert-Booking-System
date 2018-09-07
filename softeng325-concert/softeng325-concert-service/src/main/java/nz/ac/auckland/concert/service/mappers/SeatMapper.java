@@ -10,18 +10,19 @@ import java.util.Set;
 
 public class SeatMapper {
 
-    public static Seat toDomain(SeatDTO seatDTO) {
-        return new Seat(seatDTO.getRow(), seatDTO.getNumber());
-    }
-
-    public static Set<Seat> toDomainSet(Set<SeatDTO> seatDTOList) {
-        Set<Seat> seats = new HashSet<>();
-
-        for (SeatDTO seatDTO : seatDTOList) {
-            seats.add(toDomain(seatDTO));
-        }
-        return seats;
-    }
+    //TODO revise these methods.
+//    public static Seat toDomain(SeatDTO seatDTO) {
+//        return new Seat(seatDTO.getRow(), seatDTO.getNumber());
+//    }
+//
+//    public static Set<Seat> toDomainSet(Set<SeatDTO> seatDTOList) {
+//        Set<Seat> seats = new HashSet<>();
+//
+//        for (SeatDTO seatDTO : seatDTOList) {
+//            seats.add(toDomain(seatDTO));
+//        }
+//        return seats;
+//    }
 
     public static SeatDTO toDTO(Seat seat) {
         return new SeatDTO(seat.getRow(), seat.getNumber());

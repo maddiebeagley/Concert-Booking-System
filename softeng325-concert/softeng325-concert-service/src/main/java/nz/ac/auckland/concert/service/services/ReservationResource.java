@@ -26,7 +26,7 @@ public class ReservationResource {
         em.getTransaction().commit();
 
         try {
-            URI uri = new URI("/reservations/" + reservation.getId());
+            URI uri = new URI("/reservations/" + reservation.getReservationId());
             return Response.ok().location(uri).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();

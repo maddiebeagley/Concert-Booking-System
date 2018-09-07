@@ -29,17 +29,16 @@ public class Reservation {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "id")
-	private Long _id;
+	@Column(name = "reservationId")
+	private Long _reservationId;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private ReservationRequest _request;
 
 	@Column(name = "reservationTime")
 	private LocalDateTime _reservationTime;
 
-	@ElementCollection
-	@Column(name = "request")
+	@OneToMany(mappedBy = "_reservation", cascade = CascadeType.MERGE)
 	private Set<Seat> _seats = new HashSet<>();
 
 	public Reservation() {}
@@ -48,11 +47,16 @@ public class Reservation {
 	public Reservation(ReservationRequest request, Set<Seat> seats) {
 		_request = request;
 		_seats = new HashSet<Seat>(seats);
+
+		for (Seat seat : _seats) {
+			seat.setSeatStatus(SeatStatus.RESERVED);
+		}
+
 		_reservationTime = LocalDateTime.now();
 	}
 	
-	public Long getId() {
-		return _id;
+	public Long getReservationId() {
+		return _reservationId;
 	}
 
 	public LocalDateTime getReservationTime() {

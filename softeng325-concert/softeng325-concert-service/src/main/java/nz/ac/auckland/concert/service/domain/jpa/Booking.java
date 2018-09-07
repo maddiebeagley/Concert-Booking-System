@@ -1,9 +1,7 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
-import nz.ac.auckland.concert.common.dto.SeatDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -40,11 +38,9 @@ public class Booking {
 	private String _concertTitle;
 
 	@Column(name = "dateTime")
-	@Convert(converter=LocalDateTimeConverter.class)
 	private LocalDateTime _dateTime;
 
 	@ElementCollection
-	@Column(name = "seats")
 	private Set<Seat> _seats;
 
 	@Enumerated(EnumType.STRING)

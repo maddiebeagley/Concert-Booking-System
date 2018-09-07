@@ -1,12 +1,9 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
 import nz.ac.auckland.concert.common.types.PriceBand;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
 /**
@@ -38,7 +35,6 @@ public class ReservationRequest {
 	private Long _concertId;
 
 	@Column(name = "date")
-	@Convert(converter = LocalDateTimeConverter.class)
 	private LocalDateTime _date;
 
 	public ReservationRequest() {

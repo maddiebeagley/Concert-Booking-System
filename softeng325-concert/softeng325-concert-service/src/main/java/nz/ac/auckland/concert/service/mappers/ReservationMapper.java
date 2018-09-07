@@ -24,7 +24,7 @@ public class ReservationMapper {
         }
 
         return new ReservationDTO(
-                reservation.getId(),
+                reservation.getReservationId(),
                 toRequestDTO(reservation.getReservationRequest()),
                 seatDTOs
         );
