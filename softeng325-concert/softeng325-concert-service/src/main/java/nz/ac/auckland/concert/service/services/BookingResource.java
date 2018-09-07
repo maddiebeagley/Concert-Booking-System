@@ -1,11 +1,13 @@
 package nz.ac.auckland.concert.service.services;
 
+import nz.ac.auckland.concert.common.dto.ReservationDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
 import nz.ac.auckland.concert.common.dto.SeatDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
 import nz.ac.auckland.concert.service.domain.jpa.*;
+import nz.ac.auckland.concert.service.mappers.BookingMapper;
 import nz.ac.auckland.concert.service.mappers.ReservationMapper;
 import nz.ac.auckland.concert.service.mappers.SeatMapper;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
@@ -18,7 +20,12 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.awt.*;
+import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +35,13 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_XML)
 public class BookingResource {
 
+    //creates a timeout period of 10 seconds after which a reservation is not valid
+    private final LocalTime _timeout = LocalTime.of(0,0,10);
+
+    private final TemporalAmount _time = Duration.ofSeconds(10000);
+
     @POST
+    @Path("/reserve")
     public Response makeReservation(@CookieParam("token") Cookie token, ReservationRequestDTO reservationRequestDTO) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
@@ -66,17 +79,16 @@ public class BookingResource {
 
             Set<SeatDTO> bookedSeats = new HashSet<>();
 
-            TypedQuery<Booking> bookingQuery = em.createQuery("SELECT b FROM Booking b WHERE "
-                    + "b._concertId = :concertId AND b._priceBand = :priceBandValue AND "
-                    + "b._dateTime = :dateTime", Booking.class)
+            // find all the confirmed bookings for the required concert instance and price band
+            TypedQuery<Reservation> reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE "
+                    + "r._request._concertId = :concertId AND r._request._seatType = :seatType AND "
+                    + "r._request._date = :dateTime AND r._confirmed = true", Reservation.class)
                     .setParameter("concertId", reservationRequestDTO.getConcertId())
-                    .setParameter("priceBandValue", reservationRequestDTO.getSeatType())
+                    .setParameter("seatType", reservationRequestDTO.getSeatType())
                     .setParameter("dateTime", reservationRequestDTO.getDate());
 
-            List<Booking> bookings = bookingQuery.getResultList();
-
-            for (Booking booking : bookings) {
-                for (Seat seat : booking.getSeats()) {
+            for (Reservation reservation : reservationQuery.getResultList()) {
+                for (Seat seat : reservation.getSeats()) {
                     bookedSeats.add(SeatMapper.toDTO(seat));
                     System.out.println("seat: " + seat.toString());
                 }
@@ -105,7 +117,7 @@ public class BookingResource {
                         .setParameter("dateTime", reservationRequestDTO.getDate())
                         .setParameter("concertId", reservationRequestDTO.getConcertId())
                         .getSingleResult();
-                if (seat.getSeatStatus().equals(SeatStatus.RESERVED)){
+                if (seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
                     return Response.status(Response.Status.NOT_ACCEPTABLE).build();
                 }
                 availableSeats.add(seat);
@@ -113,8 +125,7 @@ public class BookingResource {
             em.getTransaction().commit();
             em.getTransaction().begin();
 
-            Reservation reservation = new Reservation(
-                    ReservationMapper.toRequestDomain(reservationRequestDTO),
+            Reservation reservation = new Reservation(ReservationMapper.toRequestDomain(reservationRequestDTO),
                     availableSeats);
 
             em.persist(reservation);
@@ -131,6 +142,79 @@ public class BookingResource {
         }
 
         return null;
+    }
+
+
+    @POST
+    @Path("/confirm")
+    public Response confirmReservation(@CookieParam("token") Cookie token, ReservationDTO reservationDTO) {
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
+                    .setParameter("tokenValue", token.getValue());
+
+            User user = query.getSingleResult();
+
+            if (user == null) { //no user in the DB maps to the provided token
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            if (user.getCreditCard() == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            em.getTransaction().commit();
+
+            em.getTransaction().begin();
+
+            Reservation reservation = em.find(Reservation.class, reservationDTO.getId());
+
+//            if (reservation.getReservationTime().plus(_time).isAfter(LocalDateTime.now())) {
+//                return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+//            }
+
+            reservation.setConfirmed(true);
+
+            em.merge(reservation);
+            em.getTransaction().commit();
+
+            return Response.status(Response.Status.CREATED).build();
+
+        } finally {
+            em.close();
+        }
+
+    }
+
+    @GET
+    public Response getBookings(@CookieParam("token") Cookie token){
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
+                    .setParameter("tokenValue", token.getValue());
+
+            User user = query.getSingleResult();
+
+            if (user == null) { //no user in the DB maps to the provided token
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+
+
+
+
+
+        } finally {
+            em.close();
+        }
+
+        return null;
+
     }
 
     private void initialiseSeats(Long concertId, LocalDateTime dateTime) {
