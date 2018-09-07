@@ -344,7 +344,9 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
+        String uri = BOOKING_WEB_SERVICE_URI + "/reserve";
+
+        Invocation.Builder builder = client.target(uri).request()
                 .accept(MediaType.APPLICATION_XML).cookie(_token);
 
         Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
@@ -368,7 +370,7 @@ public class DefaultService implements ConcertService {
      * reservation request should have been made via a call to reserveSeats(),
      * returning a ReservationDTO.
      *
-     * @param reservation a description of the reservation to confirm.
+     * @param reservationDTO a description of the reservation to confirm.
      * @throws ServiceException in response to any of the following conditions.
      *                          The exception's message is defined in
      *                          class nz.ac.auckland.concert.common.Messages.
@@ -391,13 +393,32 @@ public class DefaultService implements ConcertService {
      *                          Messages.SERVICE_COMMUNICATION_ERROR
      */
     @Override
-    public void confirmReservation(ReservationDTO reservation) throws ServiceException {
+    public void confirmReservation(ReservationDTO reservationDTO) throws ServiceException {
         //if token not set, current user is not authenticated
         if (_token == null) {
             throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
         }
 
         Client client = ClientBuilder.newClient();
+
+        String uri = BOOKING_WEB_SERVICE_URI + "/confirm";
+
+        Invocation.Builder builder = client.target(uri).request()
+                .accept(MediaType.APPLICATION_XML).cookie(_token);
+
+        Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
+
+        if (response.getStatus() == Response.Status.CREATED.getStatusCode()){
+            System.out.println("you have successfully confirmed your booking");
+        }else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+        } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()){
+            throw new ServiceException(Messages.EXPIRED_RESERVATION);
+        } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+            throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
+        }
+
+
         //TODO affix cookie to request
     }
 

@@ -23,7 +23,7 @@ public class BookingMapper {
         return new BookingDTO(
                 booking.getConcertId(),
                 booking.getConcertTitle(),
-                booking.getDateTime(),
+                booking.getConcertDateTime(),
                 seatDTOSet,
                 booking.getPriceBand());
     }

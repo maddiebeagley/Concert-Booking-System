@@ -35,7 +35,7 @@ public class User {
 	@Column(name = "creditCard")
 	private CreditCard _creditCard;
 
-	@Column(name = "token", nullable = false)
+	@Column(name = "token", nullable = false, unique = true)
 	private String _token;
 
 	protected User() {

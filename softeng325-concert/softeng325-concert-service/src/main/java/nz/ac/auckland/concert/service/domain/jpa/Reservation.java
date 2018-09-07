@@ -27,27 +27,38 @@ public class Reservation {
 	@Column(name = "reservationId")
 	private Long _reservationId;
 
+	@Column(name = "userName")
+	private String _userName;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	private ReservationRequest _request;
 
 	@Column(name = "reservationTime")
 	private LocalDateTime _reservationTime;
 
-	@OneToMany(mappedBy = "_reservation", cascade = CascadeType.MERGE)
+	@ElementCollection
+    @CollectionTable(name = "RESERVATION_SEATS", joinColumns = @JoinColumn(name="reservationId"))
+	@Column(name = "seats", nullable = false)
 	private Set<Seat> _seats = new HashSet<>();
+
+	@Column(name = "confirmed")
+	private boolean _confirmed;
 
 	public Reservation() {}
 
 	// Sets the field reservation time to store the instant the reservation was created
-	public Reservation(ReservationRequest request, Set<Seat> seats) {
+	public Reservation(ReservationRequest request, Set<Seat> seats, String userName) {
 		_request = request;
-		_seats = new HashSet<Seat>(seats);
+		_seats = new HashSet<>(seats);
+		_userName = userName;
 
 		for (Seat seat : _seats) {
-			seat.setSeatStatus(SeatStatus.RESERVED);
+			System.out.println("I have seats that have been added to the reservation");
+			seat.setSeatStatus(Seat.SeatStatus.RESERVED);
 		}
 
 		_reservationTime = LocalDateTime.now();
+		_confirmed = false;
 	}
 	
 	public Long getReservationId() {
@@ -65,5 +76,19 @@ public class Reservation {
 	public Set<Seat> getSeats() {
 		return Collections.unmodifiableSet(_seats);
 	}
-	
+
+	public boolean getConfirmed(){
+		return _confirmed;
+	}
+
+	public void setConfirmed(boolean confirm) {
+		_confirmed = confirm;
+
+		if (confirm){
+			for (Seat seat : _seats) {
+				seat.setSeatStatus(Seat.SeatStatus.CONFIRMED);
+			}
+		}
+	}
+
 }

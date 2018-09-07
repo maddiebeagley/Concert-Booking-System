@@ -1,8 +1,6 @@
 package nz.ac.auckland.concert.service.services;
 
-import nz.ac.auckland.concert.common.dto.ReservationDTO;
-import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
-import nz.ac.auckland.concert.common.dto.SeatDTO;
+import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
@@ -16,16 +14,14 @@ import nz.ac.auckland.concert.utility.TheatreLayout;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.awt.*;
 import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -126,12 +122,12 @@ public class BookingResource {
             em.getTransaction().begin();
 
             Reservation reservation = new Reservation(ReservationMapper.toRequestDomain(reservationRequestDTO),
-                    availableSeats);
+                    availableSeats, user.getUserName());
 
             em.persist(reservation);
             em.getTransaction().commit();
 
-            return Response.ok(ReservationMapper.toDTO(reservation))
+            return Response.ok(ReservationMapper.toReservationDTO(reservation))
                     .cookie(new NewCookie("token", token.getValue()))
                     .build();
 
@@ -204,16 +200,39 @@ public class BookingResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
+            em.getTransaction().commit();
 
+            String userName = user.getUserName();
 
+            em.getTransaction().begin();
 
+            //return all the confirmed reservations (bookings) from the given user
+            List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
+                    "r._userName = :userName AND r._confirmed = true", Reservation.class)
+                    .setParameter("userName", userName)
+                    .getResultList();
 
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+
+            em.getTransaction().commit();
+
+            em.getTransaction().begin();
+
+            for (Reservation reservation : reservations) {
+                System.out.println("reservation has seats: " + reservation.getSeats());
+                Concert concert = em.find(Concert.class, reservation.getReservationRequest().getConcertId());
+                bookingDTOs.add(ReservationMapper.toBookingDTO(reservation, concert.getTitle()));
+            }
+            em.getTransaction().commit();
+
+            GenericEntity<List<BookingDTO>> ge = new GenericEntity<List<BookingDTO>>(bookingDTOs) {
+            };
+
+            return Response.ok(ge).build();
 
         } finally {
             em.close();
         }
-
-        return null;
 
     }
 

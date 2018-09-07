@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement
 public class ReservationDTO {
 
-//    @XmlID
     @XmlAttribute(name="id")
 	private Long _id;
 

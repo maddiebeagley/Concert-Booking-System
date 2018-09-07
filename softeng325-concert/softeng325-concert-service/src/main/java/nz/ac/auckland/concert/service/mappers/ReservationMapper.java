@@ -1,17 +1,20 @@
 package nz.ac.auckland.concert.service.mappers;
 
+import nz.ac.auckland.concert.common.dto.BookingDTO;
 import nz.ac.auckland.concert.common.dto.ReservationDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
 import nz.ac.auckland.concert.common.dto.SeatDTO;
+import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.service.domain.jpa.Reservation;
 import nz.ac.auckland.concert.service.domain.jpa.ReservationRequest;
 import nz.ac.auckland.concert.service.domain.jpa.Seat;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class ReservationMapper {
 
-    public static ReservationDTO toDTO(Reservation reservation) {
+    public static ReservationDTO toReservationDTO(Reservation reservation) {
 
         if (reservation == null) {
             return null;
@@ -20,7 +23,7 @@ public class ReservationMapper {
         Set<SeatDTO> seatDTOs = new HashSet<>();
 
         for (Seat seat : reservation.getSeats()) {
-            seatDTOs.add(new SeatDTO(seat.getRow(), seat.getNumber()));
+            seatDTOs.add(SeatMapper.toDTO(seat));
         }
 
         return new ReservationDTO(
@@ -47,6 +50,24 @@ public class ReservationMapper {
                 reservationRequestDTO.getDate()
         );
     }
+
+    public static BookingDTO toBookingDTO(Reservation reservation, String concertTitle){
+        System.out.println("converting a reservation into a booking DTO!");
+
+        System.out.println("reservation has seats (in mapper): " + reservation.getSeats());
+
+        Set<SeatDTO> seatDTOs = SeatMapper.toDTOSet(reservation.getSeats());
+
+
+        return new BookingDTO(reservation.getReservationRequest().getConcertId(),
+                concertTitle,
+                reservation.getReservationRequest().getDate(),
+                seatDTOs,
+                reservation.getReservationRequest().getSeatType());
+
+    }
+
+
 
 
 

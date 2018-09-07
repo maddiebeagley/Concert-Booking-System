@@ -43,7 +43,7 @@ public class ReservationResource {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         em.getTransaction().begin();
-        ReservationDTO reservationDTO = ReservationMapper.toDTO(em.find(Reservation.class, id));
+        ReservationDTO reservationDTO = ReservationMapper.toReservationDTO(em.find(Reservation.class, id));
         em.getTransaction().commit();
         em.close();
 

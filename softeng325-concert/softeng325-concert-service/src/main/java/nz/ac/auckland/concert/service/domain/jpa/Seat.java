@@ -18,14 +18,16 @@ import java.time.LocalDateTime;
 @Table(name = "SEATS")
 public class Seat {
 
+	public enum SeatStatus {
+		AVAILABLE, RESERVED, CONFIRMED
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "seatId", nullable = false, unique = true)
 	private Long _seatId;
 
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinTable(name = "RESERVATION_SEATS",
-		joinColumns = @JoinColumn(name = "seatId"))
 	private Reservation _reservation;
 
 	@Column(name = "concertId", nullable = false)
