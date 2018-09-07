@@ -5,7 +5,6 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
 import nz.ac.auckland.concert.service.domain.jpa.*;
-import nz.ac.auckland.concert.service.mappers.BookingMapper;
 import nz.ac.auckland.concert.service.mappers.ReservationMapper;
 import nz.ac.auckland.concert.service.mappers.SeatMapper;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
