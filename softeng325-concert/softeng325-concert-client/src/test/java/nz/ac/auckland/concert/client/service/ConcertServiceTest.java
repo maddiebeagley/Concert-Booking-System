@@ -289,7 +289,7 @@ public class ConcertServiceTest {
 			for(SeatDTO seat : reservedSeats) {
 				assertTrue(TheatreLayout.getRowsForPriceBand(PriceBand.PriceBandB).contains(seat.getRow()));
 			}
-			
+
 			// Attempt to reserve another seat.
 			request = new ReservationRequestDTO(1, PriceBand.PriceBandB, 1L, dateTime);
 			reservation = _service.reserveSeats(request);

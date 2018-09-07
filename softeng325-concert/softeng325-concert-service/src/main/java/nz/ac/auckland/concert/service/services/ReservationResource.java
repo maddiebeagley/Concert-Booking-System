@@ -54,6 +54,4 @@ public class ReservationResource {
         }
     }
 
-    //TODO get a reservation(s) by user?
-
 }

@@ -1,9 +1,11 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
 import nz.ac.auckland.concert.common.types.PriceBand;
-import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 /**

@@ -1,24 +1,24 @@
 package nz.ac.auckland.concert.service.services;
 
-import nz.ac.auckland.concert.common.dto.BookingDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
 import nz.ac.auckland.concert.common.dto.SeatDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
 import nz.ac.auckland.concert.service.domain.jpa.*;
-import nz.ac.auckland.concert.service.mappers.*;
+import nz.ac.auckland.concert.service.mappers.ReservationMapper;
+import nz.ac.auckland.concert.service.mappers.SeatMapper;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
 import nz.ac.auckland.concert.utility.TheatreLayout;
-import org.apache.commons.lang3.reflect.Typed;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,45 +27,6 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_XML)
 @Produces(MediaType.APPLICATION_XML)
 public class BookingResource {
-
-    public BookingResource() {
-    }
-
-    @GET
-    public Response getBookingFromPriceBand(@CookieParam("token") Cookie token) {
-        // Acquire an EntityManager (creating a new persistence context).
-        EntityManager em = PersistenceManager.instance().createEntityManager();
-
-        try {
-            // Start a new transaction.
-            em.getTransaction().begin();
-
-            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
-                    .setParameter("tokenValue", token.getValue());
-
-            User user = query.getSingleResult();
-
-            if (user == null) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-
-            List<Booking> bookings = em.createQuery(
-                    "SELECT b FROM Booking b WHERE b._user = :user", Booking.class)
-                    .setParameter("user", user).getResultList();
-
-            List<BookingDTO> bookingDTOs = BookingMapper.toDTOList(bookings);
-            GenericEntity<List<BookingDTO>> ge = new GenericEntity<List<BookingDTO>>(bookingDTOs) {
-            };
-
-            em.getTransaction().commit();
-
-            return Response.ok(ge).build();
-
-        } finally {
-            em.close();
-        }
-    }
-
 
     @POST
     public Response makeReservation(@CookieParam("token") Cookie token, ReservationRequestDTO reservationRequestDTO) {

@@ -1,23 +1,13 @@
 package nz.ac.auckland.concert.client.service;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
-import nz.ac.auckland.concert.service.domain.jpa.*;
-import nz.ac.auckland.concert.service.mappers.ReservationMapper;
-import nz.ac.auckland.concert.service.mappers.SeatMapper;
-import nz.ac.auckland.concert.service.util.TheatreUtility;
-import org.hibernate.boot.jaxb.SourceType;
+import nz.ac.auckland.concert.service.domain.jpa.Performer;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -28,12 +18,6 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 public class DefaultService implements ConcertService {
@@ -377,57 +361,6 @@ public class DefaultService implements ConcertService {
         } else {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
-
-
-//        //retrieve the concert to reserve tickets for from the DB
-//        Long concertId = reservationRequestDTO.getConcertId();
-//
-//        ConcertDTO concertDTO = response.readEntity(ConcertDTO.class);
-//
-//        if (!concertDTO.getDates().contains(reservationRequestDTO.getDate())) {
-//            throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
-//        }
-//
-//        String bookingURL = BOOKING_WEB_SERVICE_URI + "/" + reservationRequestDTO.getSeatType();
-//
-//        Invocation.Builder bookingBuilder = client.target(bookingURL).request()
-//                .accept(MediaType.APPLICATION_XML);
-//
-//        Response bookingResponse = bookingBuilder.get();
-//        checkForServerError(bookingResponse);
-//
-//        Set<BookingDTO> bookingDTOs = bookingResponse.readEntity(new GenericType<Set<BookingDTO>>() {});
-//
-////        Set<SeatDTO> bookedSeats = bookingDTO.getSeats();
-//
-//////        TODO use methods properly! need to book a subset of available seats!
-////        Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(
-////                reservationRequestDTO.getNumberOfSeats(),
-////                reservationRequestDTO.getSeatType(),
-////                bookedSeats
-////        );
-//
-////        Set<Seat> availableSeats = SeatMapper.toDomainSet(availableSeatDTOs);
-////
-////        if (availableSeats.isEmpty()){
-////            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
-////        } else{
-////
-////            ReservationRequest reservationRequest = ReservationMapper.toRequestDomain(reservationRequestDTO);
-////
-////            Reservation reservation = new Reservation(reservationRequest, availableSeats);
-////            Invocation.Builder reservationBuilder = client.target(RESERVATION_WEB_SERVICE_URI).request()
-////                    .accept(MediaType.APPLICATION_XML);
-////
-////            Response reservationResponse = reservationBuilder.post(Entity.entity(reservation,
-////                    MediaType.APPLICATION_XML));
-////
-////            if (reservationResponse.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()){
-////                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
-////            }
-////
-////            return ReservationMapper.toDTO(reservation);
-////        }
     }
 
     /**

@@ -1,10 +1,7 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
-import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

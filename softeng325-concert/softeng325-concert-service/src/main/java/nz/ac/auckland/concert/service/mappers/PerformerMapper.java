@@ -23,7 +23,6 @@ public class PerformerMapper {
             concertIds.add(concert.getId());
         }
 
-        //TODO FIX IMAGE NAME
         return new PerformerDTO(
                 performer.getPerformerId(),
                 performer.getName(),
