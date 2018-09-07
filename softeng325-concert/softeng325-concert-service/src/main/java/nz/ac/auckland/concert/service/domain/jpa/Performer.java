@@ -40,10 +40,7 @@ public class Performer {
 	@Column(name = "genre")
 	private Genre _genre;
 
-	@ManyToMany
-	@JoinTable(name = "CONCERT_PERFORMER",
-			joinColumns = @JoinColumn(name = "performerId"),
-			inverseJoinColumns = @JoinColumn(name = "concertId"))
+	@ManyToMany(mappedBy = "_performers")
 	@Column(name = "concerts", nullable = false)
 	private Set<Concert> _concerts = new HashSet<>();
 
