@@ -33,7 +33,7 @@ public class BookingResource {
     //creates a timeout period of 10 seconds after which a reservation is not valid
     private final LocalTime _timeout = LocalTime.of(0,0,10);
 
-    private final TemporalAmount _time = Duration.ofSeconds(10000);
+    private final TemporalAmount _time = Duration.ofSeconds(5);
 
     @POST
     @Path("/reserve")
@@ -166,9 +166,13 @@ public class BookingResource {
 
             Reservation reservation = em.find(Reservation.class, reservationDTO.getId());
 
-//            if (reservation.getReservationTime().plus(_time).isAfter(LocalDateTime.now())) {
-//                return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
-//            }
+            System.out.println("timeStamp time: " + reservation.getReservationTime().toString());
+            System.out.println("timestamp plus time: " + reservation.getReservationTime().plus(_time).toString());
+            System.out.println("now: " + LocalDateTime.now().toString());
+
+            if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
+                return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+            }
 
             reservation.setConfirmed(true);
 
