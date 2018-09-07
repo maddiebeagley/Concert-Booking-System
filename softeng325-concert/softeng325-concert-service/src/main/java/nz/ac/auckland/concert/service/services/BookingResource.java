@@ -144,7 +144,9 @@ public class BookingResource {
                         .setParameter("dateTime", reservationRequestDTO.getDate())
                         .setParameter("concertId", reservationRequestDTO.getConcertId())
                         .getSingleResult();
-                //TODO check not already reserved or booked
+                if (seat.getSeatStatus().equals(SeatStatus.RESERVED)){
+                    return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+                }
                 availableSeats.add(seat);
             }
             em.getTransaction().commit();
