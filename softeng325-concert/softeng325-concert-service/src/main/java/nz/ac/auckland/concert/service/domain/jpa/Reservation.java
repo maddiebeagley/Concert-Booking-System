@@ -53,7 +53,6 @@ public class Reservation {
 		_userName = userName;
 
 		for (Seat seat : _seats) {
-			System.out.println("I have seats that have been added to the reservation");
 			seat.setSeatStatus(Seat.SeatStatus.RESERVED);
 		}
 

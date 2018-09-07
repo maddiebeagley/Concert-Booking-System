@@ -52,12 +52,8 @@ public class ReservationMapper {
     }
 
     public static BookingDTO toBookingDTO(Reservation reservation, String concertTitle){
-        System.out.println("converting a reservation into a booking DTO!");
-
-        System.out.println("reservation has seats (in mapper): " + reservation.getSeats());
 
         Set<SeatDTO> seatDTOs = SeatMapper.toDTOSet(reservation.getSeats());
-
 
         return new BookingDTO(reservation.getReservationRequest().getConcertId(),
                 concertTitle,

@@ -22,7 +22,7 @@
         <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1413">
-              <caret line="422" column="0" lean-forward="false" selection-start-line="422" selection-start-column="0" selection-end-line="422" selection-end-column="0" />
+              <caret line="421" column="0" lean-forward="false" selection-start-line="421" selection-start-column="0" selection-end-line="421" selection-end-column="0" />
               <folding>
                 <element signature="docComment;method#getConcerts#0;class#DefaultService#0" expanded="false" />
                 <element signature="method#getConcerts#0;class#DefaultService#0" expanded="false" />
@@ -48,11 +48,11 @@
       <file leaf-file-name="BookingResource.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/BookingResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="695">
-              <caret line="168" column="0" lean-forward="false" selection-start-line="168" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
+            <state relative-caret-position="595">
+              <caret line="166" column="0" lean-forward="false" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#9118#9136#0" expanded="true" />
+                <element signature="e#8953#8971#0" expanded="true" />
                 <element signature="method#initialiseSeats#0;class#BookingResource#0" expanded="false" />
               </folding>
             </state>
@@ -102,8 +102,18 @@
       <file leaf-file-name="ConcertServiceTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1085">
-              <caret line="333" column="53" lean-forward="false" selection-start-line="333" selection-start-column="53" selection-end-line="333" selection-end-column="53" />
+            <state relative-caret-position="6272">
+              <caret line="428" column="10" lean-forward="true" selection-start-line="428" selection-start-column="10" selection-end-line="428" selection-end-column="10" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PrintStream.java" pinned="false" current-in-tab="false">
+        <entry file="jar://C:/Program Files/Java/jdk1.8.0_181/src.zip!/java/io/PrintStream.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="797" column="75" lean-forward="true" selection-start-line="797" selection-start-column="75" selection-end-line="797" selection-end-column="75" />
               <folding />
             </state>
           </provider>
@@ -141,7 +151,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_id</find>
       <find>tarifs</find>
       <find>TARIFS</find>
       <find>TARIFFS</find>
@@ -171,6 +180,7 @@
       <find>getBookings</find>
       <find>Generic</find>
       <find>new Reser</find>
+      <find>System.</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -588,7 +598,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://C:/Users/Maddie Beagley/IdeaProjects/325Assignment2/softeng325-concert/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -608,7 +618,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.ConcertServiceTest.testMakeReservationWithUnauthenticatedUser">
+  <component name="RunManager" selected="JUnit.ConcertServiceTest.testConfirmBookingWithExpiredReservation">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -654,7 +664,7 @@
       <envs />
       <patterns />
     </configuration>
-    <configuration name="ConcertServiceTest.testConfirmReservationWithoutRegisteredCreditCard" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ConcertServiceTest.testConfirmReservation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="nz.ac.auckland.concert.client.service.*" />
@@ -666,7 +676,7 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="nz.ac.auckland.concert.client.service" />
       <option name="MAIN_CLASS_NAME" value="nz.ac.auckland.concert.client.service.ConcertServiceTest" />
-      <option name="METHOD_NAME" value="testConfirmReservationWithoutRegisteredCreditCard" />
+      <option name="METHOD_NAME" value="testConfirmReservation" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
@@ -815,19 +825,19 @@
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmReservationWithoutRegisteredCreditCard" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testRegisterCreditCard" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmBookingWithExpiredReservation" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testMakeReservationWithUnauthenticatedUser" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testRegisterCreditCard" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmBookingWithExpiredReservation" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testMakeReservationWithUnauthenticatedUser" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmReservation" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testMakeReservationWithUnauthenticatedUser" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmBookingWithExpiredReservation" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testRegisterCreditCard" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmReservationWithoutRegisteredCreditCard" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmBookingWithExpiredReservation" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testConfirmReservation" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testMakeReservationWithUnauthenticatedUser" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testCreateUserWithDuplicateUsername" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.ConcertServiceTest.testRegisterCreditCard" />
       </list>
     </recent_temporary>
   </component>
@@ -851,29 +861,29 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="ConcertServiceTest_testAuthenticateUser - 2018.09.08 at 10h 30m 46s.xml">
-      <configuration name="ConcertServiceTest.testAuthenticateUser" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testAuthenticateUserWithMissingPassword - 2018.09.08 at 10h 31m 10s.xml">
-      <configuration name="ConcertServiceTest.testAuthenticateUserWithMissingPassword" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="ConcertServiceTest_testAuthenticateWithNonExistentUser - 2018.09.08 at 10h 30m 57s.xml">
-      <configuration name="ConcertServiceTest.testAuthenticateWithNonExistentUser" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="ConcertServiceTest_testConfirmBookingWithExpiredReservation - 2018.09.08 at 10h 32m 36s.xml">
       <configuration name="ConcertServiceTest.testConfirmBookingWithExpiredReservation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testConfirmReservationWithoutRegisteredCreditCard - 2018.09.08 at 10h 31m 59s.xml">
-      <configuration name="ConcertServiceTest.testConfirmReservationWithoutRegisteredCreditCard" configurationId="JUnit" />
+    <history-entry file="ConcertServiceTest_testConfirmBookingWithExpiredReservation - 2018.09.08 at 11h 03m 37s.xml">
+      <configuration name="ConcertServiceTest.testConfirmBookingWithExpiredReservation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testCreateUserWithDuplicateUsername - 2018.09.08 at 10h 30m 33s.xml">
-      <configuration name="ConcertServiceTest.testCreateUserWithDuplicateUsername" configurationId="JUnit" />
+    <history-entry file="ConcertServiceTest_testConfirmBookingWithExpiredReservation - 2018.09.08 at 11h 07m 52s.xml">
+      <configuration name="ConcertServiceTest.testConfirmBookingWithExpiredReservation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testMakeReservation - 2018.09.08 at 10h 31m 28s.xml">
-      <configuration name="ConcertServiceTest.testMakeReservation" configurationId="JUnit" />
+    <history-entry file="ConcertServiceTest_testConfirmBookingWithExpiredReservation - 2018.09.08 at 11h 07m 58s.xml">
+      <configuration name="ConcertServiceTest.testConfirmBookingWithExpiredReservation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="ConcertServiceTest_testMakeReservationWithBadRequest - 2018.09.08 at 10h 31m 39s.xml">
-      <configuration name="ConcertServiceTest.testMakeReservationWithBadRequest" configurationId="JUnit" />
+    <history-entry file="ConcertServiceTest_testConfirmBookingWithExpiredReservation - 2018.09.08 at 11h 08m 14s.xml">
+      <configuration name="ConcertServiceTest.testConfirmBookingWithExpiredReservation" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testConfirmReservation - 2018.09.08 at 11h 01m 39s.xml">
+      <configuration name="ConcertServiceTest.testConfirmReservation" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testConfirmReservation - 2018.09.08 at 11h 06m 12s.xml">
+      <configuration name="ConcertServiceTest.testConfirmReservation" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="ConcertServiceTest_testConfirmReservation - 2018.09.08 at 11h 07m 35s.xml">
+      <configuration name="ConcertServiceTest.testConfirmReservation" configurationId="JUnit" />
     </history-entry>
     <history-entry file="ConcertServiceTest_testMakeReservationWithUnauthenticatedUser - 2018.09.08 at 10h 56m 49s.xml">
       <configuration name="ConcertServiceTest.testMakeReservationWithUnauthenticatedUser" configurationId="JUnit" />
@@ -883,7 +893,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="147763000" />
+    <option name="totallyTimeSpent" value="148441000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -907,11 +917,11 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26671913" sideWeight="0.5012461" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13330816" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45938748" sideWeight="0.4987539" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19041279" sideWeight="0.4987539" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887492" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19373111" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19373111" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296617" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -1003,7 +1013,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/softeng325-concert-common/src/main/java/nz/ac/auckland/concert/common/dto/UserDTO.java</url>
-          <line>73</line>
+          <line>72</line>
           <properties />
           <option name="timeStamp" value="28" />
         </line-breakpoint>
@@ -1020,19 +1030,11 @@
           <option name="timeStamp" value="61" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="69" />
+      <option name="time" value="73" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/domain/jpa/LocalDateTimeConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="490">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12-sources.jar!/org/junit/Assert.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="591">
@@ -1381,7 +1383,7 @@
     <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/main/java/nz/ac/auckland/concert/client/service/DefaultService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1413">
-          <caret line="422" column="0" lean-forward="false" selection-start-line="422" selection-start-column="0" selection-end-line="422" selection-end-column="0" />
+          <caret line="421" column="0" lean-forward="false" selection-start-line="421" selection-start-column="0" selection-end-line="421" selection-end-column="0" />
           <folding>
             <element signature="docComment;method#getConcerts#0;class#DefaultService#0" expanded="false" />
             <element signature="method#getConcerts#0;class#DefaultService#0" expanded="false" />
@@ -1461,20 +1463,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-service/src/main/java/nz/ac/auckland/concert/service/services/BookingResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="695">
-          <caret line="168" column="0" lean-forward="false" selection-start-line="168" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
+        <state relative-caret-position="595">
+          <caret line="166" column="0" lean-forward="false" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#9118#9136#0" expanded="true" />
+            <element signature="e#8953#8971#0" expanded="true" />
             <element signature="method#initialiseSeats#0;class#BookingResource#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_181/src.zip!/java/io/PrintStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="797" column="75" lean-forward="true" selection-start-line="797" selection-start-column="75" selection-end-line="797" selection-end-column="75" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1085">
-          <caret line="333" column="53" lean-forward="false" selection-start-line="333" selection-start-column="53" selection-end-line="333" selection-end-column="53" />
+        <state relative-caret-position="6272">
+          <caret line="428" column="10" lean-forward="true" selection-start-line="428" selection-start-column="10" selection-end-line="428" selection-end-column="10" />
           <folding />
         </state>
       </provider>

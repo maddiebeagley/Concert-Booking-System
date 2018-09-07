@@ -85,7 +85,6 @@ public class BookingResource {
             for (Reservation reservation : reservationQuery.getResultList()) {
                 for (Seat seat : reservation.getSeats()) {
                     bookedSeats.add(SeatMapper.toDTO(seat));
-                    System.out.println("seat: " + seat.toString());
                 }
             }
 
@@ -166,10 +165,6 @@ public class BookingResource {
 
             Reservation reservation = em.find(Reservation.class, reservationDTO.getId());
 
-            System.out.println("timeStamp time: " + reservation.getReservationTime().toString());
-            System.out.println("timestamp plus time: " + reservation.getReservationTime().plus(_time).toString());
-            System.out.println("now: " + LocalDateTime.now().toString());
-
             if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
                 return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
             }
@@ -222,7 +217,6 @@ public class BookingResource {
             em.getTransaction().begin();
 
             for (Reservation reservation : reservations) {
-                System.out.println("reservation has seats: " + reservation.getSeats());
                 Concert concert = em.find(Concert.class, reservation.getReservationRequest().getConcertId());
                 bookingDTOs.add(ReservationMapper.toBookingDTO(reservation, concert.getTitle()));
             }

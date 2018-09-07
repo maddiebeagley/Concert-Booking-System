@@ -409,7 +409,6 @@ public class DefaultService implements ConcertService {
         Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
 
         if (response.getStatus() == Response.Status.CREATED.getStatusCode()){
-            System.out.println("you have successfully confirmed your booking");
         }else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
             throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
         } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()){
