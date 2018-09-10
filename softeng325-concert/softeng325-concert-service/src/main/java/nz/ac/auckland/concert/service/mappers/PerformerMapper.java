@@ -26,7 +26,7 @@ public class PerformerMapper {
         return new PerformerDTO(
                 performer.getPerformerId(),
                 performer.getName(),
-                "image",
+                performer.getImageName(),
                 performer.getGenre(),
                 concertIds
         );

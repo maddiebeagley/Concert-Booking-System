@@ -19,7 +19,6 @@ public class ConcertApplication extends Application {
         _classes.add(ConcertResource.class);
         _classes.add(BookingResource.class);
         _classes.add(PerformerResource.class);
-        _classes.add(ReservationResource.class);
         _classes.add(UserResource.class);
     }
 

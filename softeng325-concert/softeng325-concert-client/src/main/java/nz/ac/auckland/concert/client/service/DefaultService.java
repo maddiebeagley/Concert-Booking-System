@@ -5,10 +5,11 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
-import nz.ac.auckland.concert.service.domain.jpa.Performer;
 
+import javax.swing.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -18,18 +19,29 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.*;
+import java.io.File;
 import java.util.Set;
 
 public class DefaultService implements ConcertService {
 
-    // AWS information to access performer images.
+    // Name of the S3 bucket that stores images.
+    private static final String AWS_BUCKET = "concert2.aucklanduni.ac.nz";
+
+    // AWS S3 access credentials for concert images.
     private static final String AWS_ACCESS_KEY_ID = "AKIAJOG7SJ36SFVZNJMQ";
     private static final String AWS_SECRET_ACCESS_KEY = "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";
-    private static final String AWS_BUCKET = "concert2.aucklanduni.ac.nz";
+
+    // Download directory - a directory named "images" in the user's home
+    // directory.
+    private static final String FILE_SEPARATOR = System
+            .getProperty("file.separator");
+    private static final String USER_DIRECTORY = System
+            .getProperty("user.home");
+    private static final String DOWNLOAD_DIRECTORY = USER_DIRECTORY
+            + FILE_SEPARATOR + "images";
 
     // URLS to access resources
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
-    private static String RESERVATION_WEB_SERVICE_URI = "http://localhost:10000/services/reservations";
     private static String PERFORMER_WEB_SERVICE_URI = "http://localhost:10000/services/performers";
     private static String USER_WEB_SERVICE_URI = "http://localhost:10000/services/users";
     private static String BOOKING_WEB_SERVICE_URI = "http://localhost:10000/services/bookings";
@@ -55,7 +67,8 @@ public class DefaultService implements ConcertService {
         Response response = builder.get();
         checkForServerError(response);
 
-        Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {});
+        Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
+        });
         return concertDTOS;
     }
 
@@ -134,7 +147,7 @@ public class DefaultService implements ConcertService {
      * service.
      *
      * @param userDTO stores the user's authentication credentials. Properties
-     *                     username and password must be set.
+     *                username and password must be set.
      * @return a UserDTO whose properties are all set.
      * @throws ServiceException in response to any of the following conditions.
      *                          The exception's message is defined in
@@ -174,7 +187,7 @@ public class DefaultService implements ConcertService {
         //there is no user with the given username
         if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
             throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
         }
 
@@ -204,6 +217,12 @@ public class DefaultService implements ConcertService {
 
         String performerURI = PERFORMER_WEB_SERVICE_URI + "/" + performerDTO.getId();
 
+        File downloadDirectory = new File(DOWNLOAD_DIRECTORY);
+
+        if (!downloadDirectory.exists()) {
+            downloadDirectory.mkdir();
+        }
+
         //retrieve the performer from the DB with the given ID
         Invocation.Builder builder = client.target(performerURI).request()
                 .accept(MediaType.APPLICATION_XML);
@@ -211,86 +230,39 @@ public class DefaultService implements ConcertService {
         Response response = builder.get();
         checkForServerError(response);
 
-        //retrieves image from performer
-        Performer performer = response.readEntity(Performer.class);
-        String imageName = performer.getImageName();
+        //no performer has been found in the DB with the given details
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+            throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+        }
+
+        String imageName = performerDTO.getImageName();
 
         //checks that performer image is not null
         if (imageName == null) {
             throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
-        } else {
-            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
-                    AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
-            AmazonS3 s3 = AmazonS3ClientBuilder
-                    .standard()
-                    .withRegion(Regions.AP_SOUTHEAST_2)
-                    .withCredentials(
-                            new AWSStaticCredentialsProvider(awsCredentials))
-                    .build();
-
-            // Download the images.
-//                return download(s3, imageName);
-            //TODO configure download method
-
-            return null;
         }
 
-    }
+        //make a new file to store the image
+        File imageFile = new File(downloadDirectory, imageName);
+        if (imageFile.exists()) {
+            return new ImageIcon(imageFile.toString()).getImage();
+        }
+
+        //the file has not yet been downloaded so needs to be retrieved from AWS
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
+                AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
+
+        AmazonS3 s3 = AmazonS3ClientBuilder
+                .standard()
+                .withRegion(Regions.AP_SOUTHEAST_2)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
 
 
-    /**
-     * Downloads images in the bucket named AWS_BUCKET.
-     *
-     * @param s3        the AmazonS3 connection.
-     * @param imageName the named image to download.
-     */
-    private static Image download(AmazonS3 s3, String imageName) {
-//
-//        File downloadDirectory = new File(DOWNLOAD_DIRECTORY);
-//        System.out.println("Will download " + imageName.size() + " files to: " + downloadDirectory.getPath());
-//
-//        TransferManager mgr = TransferManagerBuilder
-//                .standard()
-//                .withS3Client(s3)
-//                .build();
-//
-//        File imageFile = new File(downloadDirectory, imageName);
-//
-//        if (imageFile.exists()) {
-//            imageFile.delete();
-//        }
-//
-//            try {
-//                S3Object o = s3.getObject(AWS_BUCKET, AWS_SECRET_ACCESS_KEY);
-//                S3ObjectInputStream s3is = o.getObjectContent();
-//                FileOutputStream fos = new FileOutputStream(new File(AWS_SECRET_ACCESS_KEY));
-//                byte[] read_buf = new byte[1024];
-//                int read_len = 0;
-//                while ((read_len = s3is.read(read_buf)) > 0) {
-//                    fos.write(read_buf, 0, read_len);
-//                }
-//                s3is.close();
-//                fos.close();
-//            } catch (AmazonServiceException e) {
-//                System.err.println(e.getErrorMessage());
-//                System.exit(1);
-//            } catch (FileNotFoundException e) {
-//                System.err.println(e.getMessage());
-//                System.exit(1);
-//            } catch (IOException e) {
-//                System.err.println(e.getMessage());
-//                System.exit(1);
-//            }
+        GetObjectRequest req = new GetObjectRequest(AWS_BUCKET, imageName);
+        s3.getObject(req, imageFile);
 
-//
-//            System.out.print("Downloading " + imageName + "... ");
-//            GetObjectRequest req = new GetObjectRequest(AWS_BUCKET, imageName);
-//            Image image = s3.getObject(req, imageFile);
-//            s3.getObject();
-//            System.out.println("Complete!");
-
-        //TODO remove placeholder
-        return null;
+        return new ImageIcon(imageFile.toString()).getImage();
     }
 
 
@@ -351,14 +323,14 @@ public class DefaultService implements ConcertService {
 
         Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.OK.getStatusCode()){ //reservation has successfully been created
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) { //reservation has successfully been created
             ReservationDTO reservationDTO = response.readEntity(ReservationDTO.class);
             return reservationDTO;
-        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
             throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
-        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
             throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
-        } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
             throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
         } else {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
@@ -408,17 +380,14 @@ public class DefaultService implements ConcertService {
 
         Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()){
-        }else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
             throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
-        } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
             throw new ServiceException(Messages.EXPIRED_RESERVATION);
-        } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+        } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
         }
-
-
-        //TODO affix cookie to request
     }
 
     /**
@@ -456,9 +425,10 @@ public class DefaultService implements ConcertService {
         Response response = builder.put(Entity.entity(creditCard,
                 MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
-        } if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){
+        }
+        if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
             throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
         }
 
@@ -502,7 +472,8 @@ public class DefaultService implements ConcertService {
         Response response = builder.get();
         checkForServerError(response);
 
-        Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {});
+        Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {
+        });
         return bookingDTOS;
 
     }
@@ -517,7 +488,5 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
     }
-
-    //TODO make sure all methods start with the setup method.
 
 }

@@ -4,11 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import javax.persistence.Table;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
@@ -428,4 +430,18 @@ public class ConcertServiceTest {
 			assertEquals(Messages.UNAUTHENTICATED_REQUEST, e.getMessage());
 		} 
 	}
+
+	@Test
+    public void testRetrieveImageFromPerformer(){
+	    try {
+	        Set<PerformerDTO> performerDTOS = _service.getPerformers();
+
+	        for (PerformerDTO performerDTO : performerDTOS) {
+				_service.getImageForPerformer(performerDTO);
+			}
+
+        } catch (ServiceException e) {
+            fail();
+	    }
+    }
 }
