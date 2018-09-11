@@ -84,8 +84,8 @@
       <file leaf-file-name="ConcertServiceTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2862">
-              <caret line="410" column="8" lean-forward="false" selection-start-line="410" selection-start-column="8" selection-end-line="410" selection-end-column="8" />
+            <state relative-caret-position="762">
+              <caret line="350" column="9" lean-forward="true" selection-start-line="350" selection-start-column="9" selection-end-line="350" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -806,7 +806,7 @@
       <workItem from="1535945109541" duration="9157000" />
       <workItem from="1536095073759" duration="37205000" />
       <workItem from="1536538299062" duration="3276000" />
-      <workItem from="1536645304454" duration="4522000" />
+      <workItem from="1536645304454" duration="4616000" />
     </task>
     <servers />
   </component>
@@ -843,7 +843,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160250000" />
+    <option name="totallyTimeSpent" value="160344000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -856,6 +856,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-13" y="-13" width="2762" height="1770" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -867,7 +868,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26671913" sideWeight="0.5012461" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12688822" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3298153" sideWeight="0.4987539" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3298153" sideWeight="0.4987539" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901454" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1347,8 +1348,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/softeng325-concert-client/src/test/java/nz/ac/auckland/concert/client/service/ConcertServiceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2862">
-          <caret line="410" column="8" lean-forward="false" selection-start-line="410" selection-start-column="8" selection-end-line="410" selection-end-column="8" />
+        <state relative-caret-position="762">
+          <caret line="350" column="9" lean-forward="true" selection-start-line="350" selection-start-column="9" selection-end-line="350" selection-end-column="9" />
           <folding />
         </state>
       </provider>
