@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
+import nz.ac.auckland.concert.service.util.AWSUtil;
 
 import javax.swing.*;
 import javax.ws.rs.client.Client;
@@ -23,22 +24,6 @@ import java.io.File;
 import java.util.Set;
 
 public class DefaultService implements ConcertService {
-
-    // Name of the S3 bucket that stores images.
-    private static final String AWS_BUCKET = "concert2.aucklanduni.ac.nz";
-
-    // AWS S3 access credentials for concert images.
-    private static final String AWS_ACCESS_KEY_ID = "AKIAJOG7SJ36SFVZNJMQ";
-    private static final String AWS_SECRET_ACCESS_KEY = "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";
-
-    // Download directory - a directory named "images" in the user's home
-    // directory.
-    private static final String FILE_SEPARATOR = System
-            .getProperty("file.separator");
-    private static final String USER_DIRECTORY = System
-            .getProperty("user.home");
-    private static final String DOWNLOAD_DIRECTORY = USER_DIRECTORY
-            + FILE_SEPARATOR + "images";
 
     // URLS to access resources
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
@@ -217,12 +202,6 @@ public class DefaultService implements ConcertService {
 
         String performerURI = PERFORMER_WEB_SERVICE_URI + "/" + performerDTO.getId();
 
-        File downloadDirectory = new File(DOWNLOAD_DIRECTORY);
-
-        if (!downloadDirectory.exists()) {
-            downloadDirectory.mkdir();
-        }
-
         //retrieve the performer from the DB with the given ID
         Invocation.Builder builder = client.target(performerURI).request()
                 .accept(MediaType.APPLICATION_XML);
@@ -242,27 +221,8 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
         }
 
-        //make a new file to store the image
-        File imageFile = new File(downloadDirectory, imageName);
-        if (imageFile.exists()) {
-            return new ImageIcon(imageFile.toString()).getImage();
-        }
+        return AWSUtil.downloadImageFromAWS(imageName);
 
-        //the file has not yet been downloaded so needs to be retrieved from AWS
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
-                AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
-
-        AmazonS3 s3 = AmazonS3ClientBuilder
-                .standard()
-                .withRegion(Regions.AP_SOUTHEAST_2)
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .build();
-
-
-        GetObjectRequest req = new GetObjectRequest(AWS_BUCKET, imageName);
-        s3.getObject(req, imageFile);
-
-        return new ImageIcon(imageFile.toString()).getImage();
     }
 
 
@@ -488,5 +448,6 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
         }
     }
+
 
 }
