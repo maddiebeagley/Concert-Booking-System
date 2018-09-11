@@ -44,7 +44,7 @@ public class DefaultService implements ConcertService {
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
     private static String PERFORMER_WEB_SERVICE_URI = "http://localhost:10000/services/performers";
     private static String USER_WEB_SERVICE_URI = "http://localhost:10000/services/users";
-    private static String BOOKING_WEB_SERVICE_URI = "http://localhost:10000/services/bookings";
+    private static String RESERVATION_WEB_SERVICE_URI = "http://localhost:10000/services/reservations";
 
     private Cookie _token;
 
@@ -316,7 +316,7 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        String uri = BOOKING_WEB_SERVICE_URI + "/reserve";
+        String uri = RESERVATION_WEB_SERVICE_URI + "/reserve";
 
         Invocation.Builder builder = client.target(uri).request()
                 .accept(MediaType.APPLICATION_XML).cookie(_token);
@@ -373,7 +373,7 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        String uri = BOOKING_WEB_SERVICE_URI + "/confirm";
+        String uri = RESERVATION_WEB_SERVICE_URI + "/confirm";
 
         Invocation.Builder builder = client.target(uri).request()
                 .accept(MediaType.APPLICATION_XML).cookie(_token);
@@ -387,6 +387,8 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.EXPIRED_RESERVATION);
         } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
+        } else if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+            throw new ServiceException("Invalid reservation has been supplied.");
         }
     }
 
@@ -466,7 +468,7 @@ public class DefaultService implements ConcertService {
         Client client = ClientBuilder.newClient();
 
         // Make an invocation on a Concert URI and specify XML as the data return type
-        Invocation.Builder builder = client.target(BOOKING_WEB_SERVICE_URI).request()
+        Invocation.Builder builder = client.target(RESERVATION_WEB_SERVICE_URI).request()
                 .accept(MediaType.APPLICATION_XML).cookie(_token);
 
         Response response = builder.get();

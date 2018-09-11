@@ -90,4 +90,14 @@ public class Reservation {
 		}
 	}
 
+	/**
+	 * This method should only be called when a reservation has expired. All associated seats should be made available
+	 * to other reservations.
+	 */
+	public void freeSeats(){
+		for (Seat seat : _seats){
+			seat.setSeatStatus(Seat.SeatStatus.AVAILABLE);
+		}
+	}
+
 }

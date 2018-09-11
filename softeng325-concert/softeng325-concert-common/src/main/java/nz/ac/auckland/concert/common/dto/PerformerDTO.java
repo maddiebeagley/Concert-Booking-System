@@ -71,7 +71,7 @@ public class PerformerDTO {
 		return Collections.unmodifiableSet(_concertIds);
 	}
 
-	public Genre get_genre() {
+	public Genre getGenre() {
 		return _genre;
 	}
 

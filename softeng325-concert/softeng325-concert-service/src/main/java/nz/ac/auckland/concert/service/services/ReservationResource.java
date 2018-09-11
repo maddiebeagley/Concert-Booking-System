@@ -25,10 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Path("/bookings")
+@Path("/reservations")
 @Consumes(MediaType.APPLICATION_XML)
 @Produces(MediaType.APPLICATION_XML)
-public class BookingResource {
+public class ReservationResource {
 
     //creates a timeout period of 10 seconds after which a reservation is not valid
     private final LocalTime _timeout = LocalTime.of(0,0,10);
@@ -43,6 +43,11 @@ public class BookingResource {
         try {
             em.getTransaction().begin();
 
+            Long concertId = reservationRequestDTO.getConcertId();
+            LocalDateTime concertDateTime = reservationRequestDTO.getDate();
+
+            checkForExpiredReservations(concertId, concertDateTime);
+
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
                     .setParameter("tokenValue", token.getValue());
 
@@ -54,7 +59,7 @@ public class BookingResource {
             em.getTransaction().commit();
 
             em.getTransaction().begin();
-            Concert concert = em.find(Concert.class, reservationRequestDTO.getConcertId());
+            Concert concert = em.find(Concert.class, concertId);
 
             // check that the supplied concert id maps to a valid concert
             if (concert == null) {
@@ -62,7 +67,7 @@ public class BookingResource {
             }
 
             //checks the date requested in the reservation corresponds to a date of the concert
-            if (!concert.getDates().contains(reservationRequestDTO.getDate())) {
+            if (!concert.getDates().contains(concertDateTime)) {
                 return Response.status(Response.Status.EXPECTATION_FAILED).build();
             }
 
@@ -70,7 +75,7 @@ public class BookingResource {
             em.getTransaction().begin();
 
             // initialise seats if they are not yet in DB
-            initialiseSeats(reservationRequestDTO.getConcertId(), reservationRequestDTO.getDate());
+            initialiseSeats(concertId, reservationRequestDTO.getDate());
 
             Set<SeatDTO> bookedSeats = new HashSet<>();
 
@@ -78,9 +83,9 @@ public class BookingResource {
             TypedQuery<Reservation> reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE "
                     + "r._request._concertId = :concertId AND r._request._seatType = :seatType AND "
                     + "r._request._date = :dateTime AND r._confirmed = true", Reservation.class)
-                    .setParameter("concertId", reservationRequestDTO.getConcertId())
+                    .setParameter("concertId", concertId)
                     .setParameter("seatType", reservationRequestDTO.getSeatType())
-                    .setParameter("dateTime", reservationRequestDTO.getDate());
+                    .setParameter("dateTime", concertDateTime);
 
             for (Reservation reservation : reservationQuery.getResultList()) {
                 for (Seat seat : reservation.getSeats()) {
@@ -108,8 +113,8 @@ public class BookingResource {
                         "s._concertDateTime = :dateTime AND s._concertId = :concertId", Seat.class)
                         .setParameter("row", seatDTO.getRow())
                         .setParameter("number", seatDTO.getNumber())
-                        .setParameter("dateTime", reservationRequestDTO.getDate())
-                        .setParameter("concertId", reservationRequestDTO.getConcertId())
+                        .setParameter("dateTime", concertDateTime)
+                        .setParameter("concertId", concertId)
                         .getSingleResult();
                 if (seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
                     return Response.status(Response.Status.NOT_ACCEPTABLE).build();
@@ -164,6 +169,13 @@ public class BookingResource {
             em.getTransaction().begin();
 
             Reservation reservation = em.find(Reservation.class, reservationDTO.getId());
+
+            //if the status of any of the seats is already confirmed or has been reset to available, invalid booking.
+            for (Seat seat : reservation.getSeats()) {
+                if (!seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            }
 
             if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
                 return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
@@ -266,6 +278,33 @@ public class BookingResource {
         } finally {
             em.close();
         }
+    }
+
+    private void checkForExpiredReservations(Long concertId, LocalDateTime dateTime){
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
+                    "r._request._concertId = :concertId AND r._request._date = :dateTime", Reservation.class)
+                    .setParameter("concertId", concertId)
+                    .setParameter("dateTime", dateTime)
+                    .getResultList();
+
+            //free the seats associated to any expired reservations.
+            for (Reservation reservation : reservations) {
+                if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
+                    reservation.freeSeats();
+                }
+            }
+
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+
     }
 }
 
