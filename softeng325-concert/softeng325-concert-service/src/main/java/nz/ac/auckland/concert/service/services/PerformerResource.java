@@ -69,6 +69,4 @@ public class PerformerResource {
         }
     }
 
-    //TODO consider getting performers by name (first or last?)
-
 }

@@ -30,9 +30,7 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_XML)
 public class ReservationResource {
 
-    //creates a timeout period of 10 seconds after which a reservation is not valid
-    private final LocalTime _timeout = LocalTime.of(0,0,10);
-
+    //creates a timeout period of 5 seconds after which a reservation is not valid
     private final TemporalAmount _time = Duration.ofSeconds(5);
 
     @POST
@@ -82,8 +80,9 @@ public class ReservationResource {
             // find all the confirmed bookings for the required concert instance and price band
             TypedQuery<Reservation> reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE "
                     + "r._request._concertId = :concertId AND r._request._seatType = :seatType AND "
-                    + "r._request._date = :dateTime AND r._confirmed = true", Reservation.class)
+                    + "r._request._date = :dateTime AND r._reservationStatus = :reservationStatus", Reservation.class)
                     .setParameter("concertId", concertId)
+                    .setParameter("reservationStatus", Reservation.ReservationStatus.CONFIRMED)
                     .setParameter("seatType", reservationRequestDTO.getSeatType())
                     .setParameter("dateTime", concertDateTime);
 
@@ -173,7 +172,7 @@ public class ReservationResource {
             //if the status of any of the seats is already confirmed or has been reset to available, invalid booking.
             for (Seat seat : reservation.getSeats()) {
                 if (!seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
-                    return Response.status(Response.Status.BAD_REQUEST).build();
+                    return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
                 }
             }
 
@@ -181,7 +180,7 @@ public class ReservationResource {
                 return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
             }
 
-            reservation.setConfirmed(true);
+            reservation.setReservationStatus(Reservation.ReservationStatus.CONFIRMED);
 
             em.merge(reservation);
             em.getTransaction().commit();
@@ -218,8 +217,9 @@ public class ReservationResource {
 
             //return all the confirmed reservations (bookings) from the given user
             List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
-                    "r._userName = :userName AND r._confirmed = true", Reservation.class)
+                    "r._userName = :userName AND r._reservationStatus = :reservationStatus", Reservation.class)
                     .setParameter("userName", userName)
+                    .setParameter("reservationStatus", Reservation.ReservationStatus.CONFIRMED)
                     .getResultList();
 
             List<BookingDTO> bookingDTOs = new ArrayList<>();
@@ -295,7 +295,7 @@ public class ReservationResource {
             //free the seats associated to any expired reservations.
             for (Reservation reservation : reservations) {
                 if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
-                    reservation.freeSeats();
+                    reservation.setReservationStatus(Reservation.ReservationStatus.EXPIRED);
                 }
             }
 

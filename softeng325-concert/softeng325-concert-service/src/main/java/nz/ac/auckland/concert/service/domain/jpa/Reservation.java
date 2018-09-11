@@ -22,6 +22,10 @@ import java.util.Set;
 @Entity
 public class Reservation {
 
+    public enum ReservationStatus {
+        RESERVED, CONFIRMED, EXPIRED;
+    }
+
 	@Id
 	@GeneratedValue
 	@Column(name = "reservationId")
@@ -41,8 +45,9 @@ public class Reservation {
 	@Column(name = "seats", nullable = false)
 	private Set<Seat> _seats = new HashSet<>();
 
-	@Column(name = "confirmed")
-	private boolean _confirmed;
+	@Column(name = "reservationStatus")
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus _reservationStatus;
 
 	public Reservation() {}
 
@@ -51,14 +56,14 @@ public class Reservation {
 		_request = request;
 		_seats = new HashSet<>(seats);
 		_userName = userName;
+        _reservationTime = LocalDateTime.now();
+        _reservationStatus = ReservationStatus.RESERVED;
 
-		for (Seat seat : _seats) {
-			seat.setSeatStatus(Seat.SeatStatus.RESERVED);
-		}
-
-		_reservationTime = LocalDateTime.now();
-		_confirmed = false;
-	}
+        //when a reservation is initialised, all associated seats should be set to reserved.
+        for (Seat seat : _seats) {
+            seat.setSeatStatus(Seat.SeatStatus.RESERVED);
+        }
+    }
 	
 	public Long getReservationId() {
 		return _reservationId;
@@ -76,28 +81,24 @@ public class Reservation {
 		return Collections.unmodifiableSet(_seats);
 	}
 
-	public boolean getConfirmed(){
-		return _confirmed;
+	public ReservationStatus getReservationStatus(){
+		return _reservationStatus;
 	}
 
-	public void setConfirmed(boolean confirm) {
-		_confirmed = confirm;
+	public void setReservationStatus(ReservationStatus reservationStatus) {
+        _reservationStatus = reservationStatus;
 
-		if (confirm){
+		if (_reservationStatus.equals(ReservationStatus.CONFIRMED)){
+		    //seats should be confirmed when a reservation is confirmed
 			for (Seat seat : _seats) {
 				seat.setSeatStatus(Seat.SeatStatus.CONFIRMED);
 			}
-		}
-	}
-
-	/**
-	 * This method should only be called when a reservation has expired. All associated seats should be made available
-	 * to other reservations.
-	 */
-	public void freeSeats(){
-		for (Seat seat : _seats){
-			seat.setSeatStatus(Seat.SeatStatus.AVAILABLE);
-		}
+		} else if (_reservationStatus.equals(ReservationStatus.EXPIRED)) {
+		    //seats should be reset to available when a reservation expires
+            for (Seat seat : _seats) {
+                seat.setSeatStatus(Seat.SeatStatus.AVAILABLE);
+            }
+        }
 	}
 
 }

@@ -387,8 +387,6 @@ public class DefaultService implements ConcertService {
             throw new ServiceException(Messages.EXPIRED_RESERVATION);
         } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
             throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
-        } else if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
-            throw new ServiceException("Invalid reservation has been supplied.");
         }
     }
 

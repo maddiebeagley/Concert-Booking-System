@@ -432,7 +432,7 @@ public class ConcertServiceTest {
 	}
 
 	@Test
-    public void testRetrieveImageFromPerformer(){
+    public void testRetrieveImagesFromPerformers(){
 	    try {
 	        Set<PerformerDTO> performerDTOS = _service.getPerformers();
 
