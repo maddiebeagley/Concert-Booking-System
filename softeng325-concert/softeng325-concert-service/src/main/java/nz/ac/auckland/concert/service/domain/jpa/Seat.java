@@ -27,7 +27,7 @@ public class Seat {
 	@Column(name = "seatId", nullable = false, unique = true)
 	private Long _seatId;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Reservation _reservation;
 
 	@Column(name = "concertId", nullable = false)

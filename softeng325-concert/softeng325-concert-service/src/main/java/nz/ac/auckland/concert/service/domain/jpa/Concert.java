@@ -49,7 +49,7 @@ public class Concert {
 	@MapKeyEnumerated(EnumType.STRING)
 	private Map<PriceBand, BigDecimal> _tariff = new HashMap<PriceBand, BigDecimal>();
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "CONCERT_PERFORMER",
 			joinColumns = @JoinColumn(name = "concertId"),
 			inverseJoinColumns = @JoinColumn(name = "performerId"))

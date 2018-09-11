@@ -40,7 +40,7 @@ public class Performer {
 	@Column(name = "genre")
 	private Genre _genre;
 
-	@ManyToMany(mappedBy = "_performers")
+	@ManyToMany(mappedBy = "_performers", fetch = FetchType.LAZY)
 	@Column(name = "concerts", nullable = false)
 	private Set<Concert> _concerts = new HashSet<>();
 
