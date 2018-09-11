@@ -60,14 +60,6 @@ public class UserDTO {
 		return _lastName;
 	}
 
-    public void setFirstName(String _firstName) {
-        this._firstName = _firstName;
-    }
-
-    public void setLastName(String _lastName) {
-        this._lastName = _lastName;
-    }
-
     @Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof UserDTO))
