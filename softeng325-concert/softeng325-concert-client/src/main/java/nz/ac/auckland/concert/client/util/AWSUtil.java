@@ -1,4 +1,4 @@
-package nz.ac.auckland.concert.service.util;
+package nz.ac.auckland.concert.client.util;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -62,3 +62,4 @@ public class AWSUtil {
     }
 
 }
+
