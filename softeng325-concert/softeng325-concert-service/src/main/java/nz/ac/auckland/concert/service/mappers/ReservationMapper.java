@@ -17,6 +17,9 @@ import java.util.*;
  */
 public class ReservationMapper {
 
+    /*
+    Converts a domain instance of a reservation to a DTO instance.
+     */
     public static ReservationDTO toReservationDTO(Reservation reservation) {
 
         if (reservation == null) {
@@ -36,6 +39,9 @@ public class ReservationMapper {
         );
     }
 
+    /**
+     * Converts a Reservation Request to its corresponding DTO object.
+     */
     public static ReservationRequestDTO toRequestDTO(ReservationRequest reservationRequest) {
         return new ReservationRequestDTO(
                 reservationRequest.getNumberOfSeats(),
@@ -45,6 +51,9 @@ public class ReservationMapper {
         );
     }
 
+    /**
+     * Converts a ReservationRequest DTO instance into a corresponding domain model instance.
+     */
     public static ReservationRequest toRequestDomain(ReservationRequestDTO reservationRequestDTO) {
         return new ReservationRequest(
                 reservationRequestDTO.getNumberOfSeats(),
@@ -54,6 +63,10 @@ public class ReservationMapper {
         );
     }
 
+    /**
+     * Converts a Reservation into a booking DTO object since bookings and reservations are
+     * used as equivalent objects with respect to the domain objects.
+     */
     public static BookingDTO toBookingDTO(Reservation reservation, String concertTitle){
 
         Set<SeatDTO> seatDTOs = SeatMapper.toDTOSet(reservation.getSeats());

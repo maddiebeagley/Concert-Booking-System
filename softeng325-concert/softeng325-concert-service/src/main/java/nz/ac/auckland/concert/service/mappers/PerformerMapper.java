@@ -14,6 +14,9 @@ import java.util.Set;
  */
 public class PerformerMapper {
 
+    /**
+     * Converts a domain instance of a performer into a DTO instance
+     */
     public static PerformerDTO toDTO(Performer performer){
 
         if (performer == null) {
@@ -35,6 +38,9 @@ public class PerformerMapper {
         );
     }
 
+    /**
+     * Converts a list of domain performers into a list of DTO performers
+     */
     public static List<PerformerDTO> toDTOList(List<Performer> performers) {
         List<PerformerDTO> performerDTOS = new ArrayList<>();
 

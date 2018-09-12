@@ -11,6 +11,9 @@ import java.util.List;
  */
 public class UserMapper {
 
+    /*
+    Converts an instance of a user DTO to an instance of a domain user.
+     */
     public static User toDomain(UserDTO userDTO) {
         return new User(
                 userDTO.getUserName(),
@@ -19,6 +22,9 @@ public class UserMapper {
                 userDTO.getFirstName());
     }
 
+    /**
+     * Converts an instance of a domain User to a DTO user.
+     */
     public static UserDTO toDTO(User user) {
         return new UserDTO(user.getUserName(),
                 user.getPassword(),
@@ -26,12 +32,4 @@ public class UserMapper {
                 user.getFirstName());
     }
 
-    public static List<UserDTO> toDTOList(List<User> users) {
-        List<UserDTO> userDTOS = new ArrayList<>();
-
-        for (User user : users) {
-            userDTOS.add(toDTO(user));
-        }
-        return userDTOS;
-    }
 }

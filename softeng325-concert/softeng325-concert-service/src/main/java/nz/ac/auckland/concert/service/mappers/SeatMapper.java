@@ -13,10 +13,16 @@ import java.util.Set;
  */
 public class SeatMapper {
 
+    /*
+    Converts a domain instance of a seat to a DTO instance.
+     */
     public static SeatDTO toDTO(Seat seat) {
         return new SeatDTO(seat.getRow(), seat.getNumber());
     }
 
+    /**
+     * Converts a set of domain seats to a set of DTO seats.
+     */
     public static Set<SeatDTO> toDTOSet(Set<Seat> seats) {
         Set<SeatDTO> seatDTOS = new HashSet<>();
 
