@@ -8,6 +8,9 @@ import nz.ac.auckland.concert.service.domain.jpa.Performer;
 import java.math.BigDecimal;
 import java.util.*;
 
+/**
+ * Simple helper class for converting to and from DTO and domain instances.
+ */
 public class ConcertMapper {
 
     /**
@@ -24,10 +27,12 @@ public class ConcertMapper {
         HashMap<PriceBand, BigDecimal> ticketPrices = new HashMap<PriceBand, BigDecimal>();
         Set<Long> performerIds = new HashSet<>();
 
+        //find all the ticket prices for concert DTO
         for (PriceBand priceBand : PriceBand.values()) {
             ticketPrices.put(priceBand, concert.getTicketPrice(priceBand));
         }
 
+        //find all the performers of the current concerts.
         for (Performer performer : concert.getPerformers()) {
             performerIds.add(performer.getPerformerId());
         }
@@ -39,6 +44,9 @@ public class ConcertMapper {
                 performerIds);
     }
 
+    /**
+     * Converts a list of domain objects to a list of DTO objects.
+     */
     public static List<ConcertDTO> toDTOList(List<Concert> concerts) {
         List<ConcertDTO> concertDTOS = new ArrayList<>();
 

@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Simple helper class for converting to and from DTO and domain instances.
+ */
 public class PerformerMapper {
 
     public static PerformerDTO toDTO(Performer performer){

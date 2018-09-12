@@ -12,6 +12,9 @@ import nz.ac.auckland.concert.service.domain.jpa.Seat;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Simple helper class for converting to and from DTO and domain instances.
+ */
 public class ReservationMapper {
 
     public static ReservationDTO toReservationDTO(Reservation reservation) {

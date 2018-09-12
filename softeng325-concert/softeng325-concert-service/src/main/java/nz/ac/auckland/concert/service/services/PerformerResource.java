@@ -25,18 +25,16 @@ public class PerformerResource {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
-            // Start a new transaction.
             em.getTransaction().begin();
 
-            // Use the EntityManager to retrieve, persist or delete object(s).
+            //find the performer with the supplied ID
             PerformerDTO performerDTO = PerformerMapper.toDTO(em.find(Performer.class, id));
 
-            // Commit the transaction.
             em.getTransaction().commit();
 
-            if (performerDTO == null) {
+            if (performerDTO == null) { //there is no performer in the DB with the supplied ID
                 return Response.status(Response.Status.NOT_FOUND).build();
-            } else {
+            } else { // return the transferrable performer object to the client
                 return Response.ok(performerDTO).build();
             }
         } finally {
@@ -53,15 +51,15 @@ public class PerformerResource {
             // Start a new transaction.
             em.getTransaction().begin();
 
+            //find all performers in the DB and convert them to their transferrable DTO form
             TypedQuery<Performer> query = em.createQuery("SELECT p FROM Performer p", Performer.class);
-
             List<PerformerDTO> performerDTOS = PerformerMapper.toDTOList(query.getResultList());
-
             GenericEntity<List<PerformerDTO>> ge = new GenericEntity<List<PerformerDTO>>(performerDTOS) {
             };
 
             em.getTransaction().commit();
 
+            //return the DTO performer objects to the client
             return Response.ok(ge).build();
 
         } finally {

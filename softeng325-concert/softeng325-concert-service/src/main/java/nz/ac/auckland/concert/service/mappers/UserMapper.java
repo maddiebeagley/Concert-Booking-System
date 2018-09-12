@@ -6,6 +6,9 @@ import nz.ac.auckland.concert.service.domain.jpa.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Simple helper class for converting to and from DTO and domain instances.
+ */
 public class UserMapper {
 
     public static User toDomain(UserDTO userDTO) {

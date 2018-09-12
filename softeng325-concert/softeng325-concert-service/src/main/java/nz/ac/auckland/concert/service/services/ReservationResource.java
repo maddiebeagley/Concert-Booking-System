@@ -47,11 +47,15 @@ public class ReservationResource {
             Long concertId = reservationRequestDTO.getConcertId();
             LocalDateTime concertDateTime = reservationRequestDTO.getDate();
 
+            //at the start of generating each new reservation, free the seats associated to any expired reservations
+            //for the given concert on the given date
             checkForExpiredReservations(concertId, concertDateTime);
 
+            //check that the current user is authenticated
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
                     .setParameter("tokenValue", token.getValue());
 
+            //user associated to the supplied token
             User user = query.getSingleResult();
 
             if (user == null) { //no user in the DB maps to the provided token
@@ -62,8 +66,7 @@ public class ReservationResource {
             em.getTransaction().begin();
             Concert concert = em.find(Concert.class, concertId);
 
-            // check that the supplied concert id maps to a valid concert
-            if (concert == null) {
+            if (concert == null) { // no concert in the DB matches the supplied concert ID
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
@@ -89,6 +92,7 @@ public class ReservationResource {
                     .setParameter("seatType", reservationRequestDTO.getSeatType())
                     .setParameter("dateTime", concertDateTime);
 
+            // find all the seats that are already booked
             for (Reservation reservation : reservationQuery.getResultList()) {
                 for (Seat seat : reservation.getSeats()) {
                     bookedSeats.add(SeatMapper.toDTO(seat));
@@ -97,11 +101,12 @@ public class ReservationResource {
 
             em.getTransaction().commit();
 
+            //find a set of seats that the user is able to reserve
             Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(reservationRequestDTO.getNumberOfSeats(),
                     reservationRequestDTO.getSeatType(),
                     bookedSeats);
 
-            if (availableSeatDTOs.isEmpty()) {
+            if (availableSeatDTOs.isEmpty()) { //there are no seats available to book, reservation cannot go through
                 return Response.status(Response.Status.NOT_ACCEPTABLE).build();
             }
 
@@ -109,6 +114,7 @@ public class ReservationResource {
 
             em.getTransaction().begin();
 
+            //checks that the "available" seats have not already been reserved
             for (SeatDTO seatDTO : availableSeatDTOs) {
                 Seat seat = em.createQuery("SELECT s FROM Seat s WHERE " +
                         "s._row = :row AND s._number =:number AND " +
@@ -126,12 +132,14 @@ public class ReservationResource {
             em.getTransaction().commit();
             em.getTransaction().begin();
 
+            //generates a new reservation for the user
             Reservation reservation = new Reservation(ReservationMapper.toRequestDomain(reservationRequestDTO),
                     availableSeats, user.getUserName());
 
             em.persist(reservation);
             em.getTransaction().commit();
 
+            //returns the new reservation and the authentication token back to the client
             return Response.ok(ReservationMapper.toReservationDTO(reservation))
                     .cookie(new NewCookie("token", token.getValue()))
                     .build();
@@ -154,32 +162,34 @@ public class ReservationResource {
         try {
             em.getTransaction().begin();
 
+            //use the supplied token to check if the user is authenticated
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
                     .setParameter("tokenValue", token.getValue());
 
+            //user that maps to the supplied token
             User user = query.getSingleResult();
 
             if (user == null) { //no user in the DB maps to the provided token
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            if (user.getCreditCard() == null) {
+            if (user.getCreditCard() == null) { //the user does not have a credit card registered
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             em.getTransaction().commit();
 
             em.getTransaction().begin();
 
+            //find the reservation to be confirmed
             Reservation reservation = em.find(Reservation.class, reservationDTO.getId());
 
-            //if the status of any of the seats is already confirmed or has been reset to available, invalid booking.
-            for (Seat seat : reservation.getSeats()) {
-                if (!seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
-                    return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
-                }
-            }
-
+            //if the current reservation has expired, set it to expired
             if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
+                if (!reservation.getReservationStatus().equals(Reservation.ReservationStatus.EXPIRED)) {
+                    reservation.setReservationStatus(Reservation.ReservationStatus.EXPIRED);
+                    em.merge(reservation);
+                    em.getTransaction().commit();
+                }
                 return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
             }
 
@@ -203,6 +213,7 @@ public class ReservationResource {
         try {
             em.getTransaction().begin();
 
+            //use supplied token to authenticate user
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
                     .setParameter("tokenValue", token.getValue());
 
@@ -214,9 +225,8 @@ public class ReservationResource {
 
             em.getTransaction().commit();
 
-            String userName = user.getUserName();
-
             em.getTransaction().begin();
+            String userName = user.getUserName();
 
             //return all the confirmed reservations (bookings) from the given user
             List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
@@ -225,12 +235,13 @@ public class ReservationResource {
                     .setParameter("reservationStatus", Reservation.ReservationStatus.CONFIRMED)
                     .getResultList();
 
-            List<BookingDTO> bookingDTOs = new ArrayList<>();
-
             em.getTransaction().commit();
 
             em.getTransaction().begin();
 
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+
+            //convert the given reservations to a transferrable DTO form
             for (Reservation reservation : reservations) {
                 Concert concert = em.find(Concert.class, reservation.getReservationRequest().getConcertId());
                 bookingDTOs.add(ReservationMapper.toBookingDTO(reservation, concert.getTitle()));
@@ -240,6 +251,7 @@ public class ReservationResource {
             GenericEntity<List<BookingDTO>> ge = new GenericEntity<List<BookingDTO>>(bookingDTOs) {
             };
 
+            //return the bookings from the DB to the client
             return Response.ok(ge).build();
 
         } finally {
@@ -248,6 +260,10 @@ public class ReservationResource {
 
     }
 
+    /**
+     * Helper method to initialise all the seats for a concert on a given date. All seats are initially set to
+     * available so they are free to be reserved by any user. No action is taken if the seats are already in the DB.
+     */
     private void initialiseSeats(Long concertId, LocalDateTime dateTime) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
@@ -263,6 +279,7 @@ public class ReservationResource {
 
             if (seats.isEmpty()) {
 
+                //initialise all the seats for the given concert and persist them to the DB
                 for (PriceBand priceBand : PriceBand.values()) {
                     for (SeatRow seatRow : TheatreLayout.getRowsForPriceBand(priceBand)) {
                         int numSeats = TheatreLayout.getNumberOfSeatsForRow(seatRow);
@@ -283,22 +300,29 @@ public class ReservationResource {
         }
     }
 
+    /**
+     * Helper method that goes through all the reservations associated to a particular concert and marks any
+     * reservation that is expired. This will free up the seats in the reservation so that other users are able
+     * to book them.
+     */
     private void checkForExpiredReservations(Long concertId, LocalDateTime dateTime){
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
             em.getTransaction().begin();
 
+            //find all the reservations associated to the supplied concert on supplied date
             List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
                     "r._request._concertId = :concertId AND r._request._date = :dateTime", Reservation.class)
                     .setParameter("concertId", concertId)
                     .setParameter("dateTime", dateTime)
                     .getResultList();
 
-            //free the seats associated to any expired reservations.
+            //mark any reservation that are expired if it has passed its expiration time.
             for (Reservation reservation : reservations) {
                 if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
                     reservation.setReservationStatus(Reservation.ReservationStatus.EXPIRED);
+                    em.merge(reservation);
                 }
             }
 

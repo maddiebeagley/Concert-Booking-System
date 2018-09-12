@@ -27,15 +27,15 @@ public class UserResource {
         em.getTransaction().begin();
         User user = em.find(User.class, newUserDTO.getUserName());
 
-        //a user has been found with the input username, ie username is not unique
-        if (user != null) {
+        if (user != null) { //a user has been found with the input username, ie username is not unique
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
 
         // code will only reach here and commit the desired new user if all criteria are met
-        //a cookie is generated with a unique ID and assigned to the user
+        //a cookie is generated with a unique ID and assigned to the user for authentication purposes
         NewCookie newCookie = new NewCookie("token", UUID.randomUUID().toString());
 
+        //generates a new user from the given values and sets its authentication token
         User newUser = UserMapper.toDomain(newUserDTO);
         newUser.setToken(newCookie.getValue());
 
@@ -92,7 +92,7 @@ public class UserResource {
     @Path("/registerCard")
     public Response addCreditCard(CreditCardDTO creditCardDTO, @CookieParam("token") Cookie token) {
 
-        if (token == null) {
+        if (token == null) { // user has not supplied a token so they are not authenticated.
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         EntityManager em = PersistenceManager.instance().createEntityManager();
@@ -100,12 +100,13 @@ public class UserResource {
         try {
             em.getTransaction().begin();
 
+            //check that the supplied token maps to a user in the DB
             TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u._token = :tokenValue", User.class)
                     .setParameter("tokenValue", token.getValue());
 
             User user  = query.getSingleResult();
 
-            if (user == null) {
+            if (user == null) { //no user in the DB has the supplied token
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             //update the credit card field of the supplied user
