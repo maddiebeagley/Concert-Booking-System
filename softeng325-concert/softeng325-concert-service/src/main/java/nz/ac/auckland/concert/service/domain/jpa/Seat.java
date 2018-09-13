@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
+import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
 
@@ -27,8 +28,14 @@ public class Seat {
 	@Column(name = "seatId", nullable = false, unique = true)
 	private Long _seatId;
 
+	@Version
+	private Integer _version;
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Reservation _reservation;
+
+	@Enumerated(EnumType.STRING)
+	private PriceBand _seatType;
 
 	@Column(name = "concertId", nullable = false)
 	private Long _concertId;
@@ -64,16 +71,24 @@ public class Seat {
 		return _number;
 	}
 
-	public Reservation get_reservation() {
+	public Reservation getReservation() {
 		return _reservation;
 	}
 
-	public void set_reservation(Reservation _reservation) {
+	public void setReservation(Reservation _reservation) {
 		this._reservation = _reservation;
 	}
 
 	public SeatStatus getSeatStatus(){
 		return _seatStatus;
+	}
+
+	public PriceBand getSeatType() {
+		return _seatType;
+	}
+
+	public void setSeatType(PriceBand _seatType) {
+		this._seatType = _seatType;
 	}
 
 	public Long getConcertId(){
@@ -95,4 +110,6 @@ public class Seat {
 	public void setSeatStatus(SeatStatus seatStatus){
 		_seatStatus = seatStatus;
 	}
+
+
 }

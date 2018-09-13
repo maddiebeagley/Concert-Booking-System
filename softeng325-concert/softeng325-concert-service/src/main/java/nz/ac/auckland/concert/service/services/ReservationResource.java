@@ -81,23 +81,16 @@ public class ReservationResource {
             // initialise seats if they are not yet in DB
             initialiseSeats(concertId, reservationRequestDTO.getDate());
 
-            Set<SeatDTO> bookedSeats = new HashSet<>();
-
             // find all the confirmed bookings for the required concert instance and price band
-            TypedQuery<Reservation> reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE "
-                    + "r._request._concertId = :concertId AND r._request._seatType = :seatType AND "
-                    + "r._request._date = :dateTime AND r._reservationStatus = :reservationStatus", Reservation.class)
+            TypedQuery<Seat> seatQuery = em.createQuery("SELECT s FROM Seat s WHERE "
+                    + "s._concertId = :concertId AND s._seatType = :seatType AND "
+                    + "s._concertDateTime = :dateTime AND s._seatStatus <> :seatStatus", Seat.class)
                     .setParameter("concertId", concertId)
-                    .setParameter("reservationStatus", Reservation.ReservationStatus.CONFIRMED)
+                    .setParameter("seatStatus", Seat.SeatStatus.AVAILABLE)
                     .setParameter("seatType", reservationRequestDTO.getSeatType())
                     .setParameter("dateTime", concertDateTime);
 
-            // find all the seats that are already booked
-            for (Reservation reservation : reservationQuery.getResultList()) {
-                for (Seat seat : reservation.getSeats()) {
-                    bookedSeats.add(SeatMapper.toDTO(seat));
-                }
-            }
+            Set<SeatDTO> bookedSeats = SeatMapper.toDTOSet(new HashSet<Seat>(seatQuery.getResultList()));
 
             em.getTransaction().commit();
 
@@ -288,6 +281,7 @@ public class ReservationResource {
                                     new SeatNumber(num),
                                     concertId,
                                     dateTime);
+                            seat.setSeatType(priceBand);
                             em.persist(seat);
                         }
                     }
