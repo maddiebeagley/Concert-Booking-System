@@ -29,7 +29,8 @@ public class Seat {
 	private Long _seatId;
 
 	@Version
-	private Integer _version;
+	@Column(name = "version")
+	private long _version;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Reservation _reservation;
@@ -89,6 +90,14 @@ public class Seat {
 
 	public void setSeatType(PriceBand _seatType) {
 		this._seatType = _seatType;
+	}
+
+	public long getVersion() {
+		return _version;
+	}
+
+	public void setVersion(long _version) {
+		this._version = _version;
 	}
 
 	public Long getConcertId(){

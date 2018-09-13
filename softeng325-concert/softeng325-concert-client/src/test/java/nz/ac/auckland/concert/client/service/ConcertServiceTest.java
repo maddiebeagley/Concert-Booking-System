@@ -426,4 +426,62 @@ public class ConcertServiceTest {
             fail();
 	    }
     }
+
+	@Test
+	public void testRetrieveConcertsFromCache() {
+		final int numberOfConcerts = 25;
+
+		Set<ConcertDTO> concerts = _service.getConcerts();
+		Set<ConcertDTO> cachedConcerts = _service.getConcerts();
+
+		assertEquals(concerts, cachedConcerts);
+		assertEquals(numberOfConcerts, concerts.size());
+	}
+
+	@Test
+	public void testRetrieveConcertsFromCacheUpdate() {
+		final int numberOfConcerts = 25;
+
+		Set<ConcertDTO> concerts = _service.getConcerts();
+
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		Set<ConcertDTO> cachedConcerts = _service.getConcerts();
+
+		assertEquals(concerts, cachedConcerts);
+		assertEquals(numberOfConcerts, concerts.size());
+	}
+
+	@Test
+	public void testRetrievePerformersFromCache() {
+		final int numberOfPerformers = 20;
+
+		Set<PerformerDTO> performers = _service.getPerformers();
+		Set<PerformerDTO> performersCached = _service.getPerformers();
+
+		assertEquals(performers, performersCached);
+		assertEquals(numberOfPerformers, performers.size());
+	}
+
+	@Test
+	public void testRetrievePerformersFromCacheUpdate() {
+		final int numberOfPerformers = 20;
+
+		Set<PerformerDTO> performers = _service.getPerformers();
+
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		Set<PerformerDTO> performersCached = _service.getPerformers();
+
+		assertEquals(performers, performersCached);
+		assertEquals(numberOfPerformers, performers.size());
+	}
 }

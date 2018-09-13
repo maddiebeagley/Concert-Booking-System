@@ -7,6 +7,7 @@ import nz.ac.auckland.concert.service.mappers.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,6 +18,8 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_XML)
 public class PerformerResource {
 
+    //caches should only be stored for 10 second intervals
+    private int cacheTime = 10;
 
     @GET
     @Path("{id}")
@@ -59,8 +62,11 @@ public class PerformerResource {
 
             em.getTransaction().commit();
 
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(cacheTime);
+
             //return the DTO performer objects to the client
-            return Response.ok(ge).build();
+            return Response.ok(ge).cacheControl(cacheControl).build();
 
         } finally {
             em.close();

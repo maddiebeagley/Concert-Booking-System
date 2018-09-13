@@ -7,6 +7,7 @@ import nz.ac.auckland.concert.service.mappers.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,6 +17,8 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_XML)
 @Produces(MediaType.APPLICATION_XML)
 public class ConcertResource {
+
+    private int cacheTime = 10;
 
     @GET
     @Path("{id}")
@@ -58,8 +61,11 @@ public class ConcertResource {
 
             em.getTransaction().commit();
 
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(cacheTime);
+
             //return all concerts retrieved from the DB to the client
-            return Response.ok(ge).build();
+            return Response.ok(ge).cacheControl(cacheControl).build();
 
         } finally {
             em.close();

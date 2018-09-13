@@ -8,14 +8,24 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.awt.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DefaultService implements ConcertService {
+
+    private Set<PerformerDTO> _performerCache = new HashSet<>();
+    private LocalDateTime _performerCacheExpiry = null;
+
+    private Set<ConcertDTO> _concertCache = new HashSet<>();
+    private LocalDateTime _concertCacheExpiry = null;
+
 
     // URLS to access resources
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
@@ -35,18 +45,34 @@ public class DefaultService implements ConcertService {
     @Override
     public Set<ConcertDTO> getConcerts() throws ServiceException {
 
-        Client client = ClientBuilder.newClient();
+        if (_concertCacheExpiry == null || _concertCacheExpiry.isBefore(LocalDateTime.now())) {
 
-        // Make an invocation on a Concert URI and specify XML as the data return type
-        Invocation.Builder builder = client.target(CONCERT_WEB_SERVICE_URI).request()
-                .accept(MediaType.APPLICATION_XML);
+            System.out.println("sending request to get shit");
+            Client client = ClientBuilder.newClient();
 
-        Response response = builder.get();
-        checkForServerError(response);
+            // Make an invocation on a Concert URI and specify XML as the data return type
+            Invocation.Builder builder = client.target(CONCERT_WEB_SERVICE_URI).request()
+                    .accept(MediaType.APPLICATION_XML);
 
-        Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
-        });
-        return concertDTOS;
+            Response response = builder.get();
+            checkForServerError(response);
+
+            Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
+            });
+
+            CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
+
+            int cacheTime = cacheControl.getMaxAge();
+            LocalDateTime now = LocalDateTime.now();
+
+            _concertCache = concertDTOS;
+            _concertCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+
+            return concertDTOS;
+        } else {
+            System.out.println("getting from cache");
+            return _concertCache;
+        }
     }
 
     /**
@@ -58,17 +84,34 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public Set<PerformerDTO> getPerformers() throws ServiceException {
-        Client client = ClientBuilder.newClient();
-        // Make an invocation on a Concert URI and specify XML as the data return type
-        Invocation.Builder builder = client.target(PERFORMER_WEB_SERVICE_URI).request()
-                .accept(MediaType.APPLICATION_XML);
+        if (_performerCacheExpiry == null || _performerCacheExpiry.isBefore(LocalDateTime.now())){
+            System.out.println("getting from new request");
+            Client client = ClientBuilder.newClient();
+            // Make an invocation on a Concert URI and specify XML as the data return type
+            Invocation.Builder builder = client.target(PERFORMER_WEB_SERVICE_URI).request()
+                    .accept(MediaType.APPLICATION_XML);
 
-        Response response = builder.get();
-        checkForServerError(response);
+            Response response = builder.get();
+            checkForServerError(response);
 
-        Set<PerformerDTO> performerDTOS = response.readEntity(new GenericType<Set<PerformerDTO>>() {
-        });
-        return performerDTOS;
+            Set<PerformerDTO> performerDTOS = response.readEntity(new GenericType<Set<PerformerDTO>>() {
+            });
+
+            CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
+
+            int cacheTime = cacheControl.getMaxAge();
+            LocalDateTime now = LocalDateTime.now();
+
+            _performerCache.addAll(performerDTOS);
+            _performerCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+
+            return performerDTOS;
+        } else {
+            System.out.println("getting from cache");
+            return _performerCache;
+        }
+
+
 
     }
 
