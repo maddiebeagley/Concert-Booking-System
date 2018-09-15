@@ -3,20 +3,16 @@ package nz.ac.auckland.concert.client.service;
 import nz.ac.auckland.concert.client.util.AWSUtil;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
+import nz.ac.auckland.concert.service.domain.jpa.NewsItem;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
 import java.awt.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class DefaultService implements ConcertService {
 
@@ -26,12 +22,14 @@ public class DefaultService implements ConcertService {
     private Set<ConcertDTO> _concertCache = new HashSet<>();
     private LocalDateTime _concertCacheExpiry = null;
 
+    private final static Logger LOGGER = Logger.getLogger(DefaultService.class.getName());
 
     // URLS to access resources
     private static String CONCERT_WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
     private static String PERFORMER_WEB_SERVICE_URI = "http://localhost:10000/services/performers";
     private static String USER_WEB_SERVICE_URI = "http://localhost:10000/services/users";
     private static String RESERVATION_WEB_SERVICE_URI = "http://localhost:10000/services/reservations";
+    private static String NEWS_ITEM_WEB_SERVICE_URI = "http://localhost:10000/services/newsItems";
 
     private Cookie _token;
 
@@ -45,33 +43,38 @@ public class DefaultService implements ConcertService {
     @Override
     public Set<ConcertDTO> getConcerts() throws ServiceException {
 
-        if (_concertCacheExpiry == null || _concertCacheExpiry.isBefore(LocalDateTime.now())) {
+        Client client = ClientBuilder.newClient();
 
-            System.out.println("sending request to get shit");
-            Client client = ClientBuilder.newClient();
+        try {
+            if (_concertCacheExpiry == null || _concertCacheExpiry.isBefore(LocalDateTime.now())) {
 
-            // Make an invocation on a Concert URI and specify XML as the data return type
-            Invocation.Builder builder = client.target(CONCERT_WEB_SERVICE_URI).request()
-                    .accept(MediaType.APPLICATION_XML);
+                // Make an invocation on a Concert URI and specify XML as the data return type
+                Invocation.Builder builder = client.target(CONCERT_WEB_SERVICE_URI).request()
+                        .accept(MediaType.APPLICATION_XML);
 
-            Response response = builder.get();
-            checkForServerError(response);
+                Response response = builder.get();
 
-            Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
-            });
+                if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+                    throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+                }
 
-            CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
+                Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
+                });
 
-            int cacheTime = cacheControl.getMaxAge();
-            LocalDateTime now = LocalDateTime.now();
+                CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
 
-            _concertCache = concertDTOS;
-            _concertCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+                int cacheTime = cacheControl.getMaxAge();
+                LocalDateTime now = LocalDateTime.now();
 
-            return concertDTOS;
-        } else {
-            System.out.println("getting from cache");
-            return _concertCache;
+                _concertCache = concertDTOS;
+                _concertCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+
+                return concertDTOS;
+            } else {
+                return _concertCache;
+            }
+        } finally {
+            client.close();
         }
     }
 
@@ -84,34 +87,38 @@ public class DefaultService implements ConcertService {
      */
     @Override
     public Set<PerformerDTO> getPerformers() throws ServiceException {
-        if (_performerCacheExpiry == null || _performerCacheExpiry.isBefore(LocalDateTime.now())){
-            System.out.println("getting from new request");
-            Client client = ClientBuilder.newClient();
-            // Make an invocation on a Concert URI and specify XML as the data return type
-            Invocation.Builder builder = client.target(PERFORMER_WEB_SERVICE_URI).request()
-                    .accept(MediaType.APPLICATION_XML);
+        Client client = ClientBuilder.newClient();
 
-            Response response = builder.get();
-            checkForServerError(response);
+        try {
+            if (_performerCacheExpiry == null || _performerCacheExpiry.isBefore(LocalDateTime.now())) {
+                // Make an invocation on a Concert URI and specify XML as the data return type
+                Invocation.Builder builder = client.target(PERFORMER_WEB_SERVICE_URI).request()
+                        .accept(MediaType.APPLICATION_XML);
 
-            Set<PerformerDTO> performerDTOS = response.readEntity(new GenericType<Set<PerformerDTO>>() {
-            });
+                Response response = builder.get();
 
-            CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
+                if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+                    throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+                }
 
-            int cacheTime = cacheControl.getMaxAge();
-            LocalDateTime now = LocalDateTime.now();
+                Set<PerformerDTO> performerDTOS = response.readEntity(new GenericType<Set<PerformerDTO>>() {
+                });
 
-            _performerCache.addAll(performerDTOS);
-            _performerCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+                CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
 
-            return performerDTOS;
-        } else {
-            System.out.println("getting from cache");
-            return _performerCache;
+                int cacheTime = cacheControl.getMaxAge();
+                LocalDateTime now = LocalDateTime.now();
+
+                _performerCache.addAll(performerDTOS);
+                _performerCacheExpiry = now.plus(Duration.ofSeconds(cacheTime));
+
+                return performerDTOS;
+            } else {
+                return _performerCache;
+            }
+        } finally {
+            client.close();
         }
-
-
 
     }
 
@@ -140,24 +147,28 @@ public class DefaultService implements ConcertService {
     public UserDTO createUser(UserDTO newUser) throws ServiceException {
         Client client = ClientBuilder.newClient();
 
-        // a request is only made if all required fields are set
-        if (newUser.getUserName() == null || newUser.getPassword() == null ||
-                newUser.getFirstName() == null || newUser.getLastName() == null) {
-            throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
-        }
+        try {
+            // a request is only made if all required fields are set
+            if (newUser.getUserName() == null || newUser.getPassword() == null ||
+                    newUser.getFirstName() == null || newUser.getLastName() == null) {
+                throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
+            }
 
-        //send HTTP request to create new user
-        Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
-        Response response = builder.post(Entity.entity(newUser, MediaType.APPLICATION_XML));
+            //send HTTP request to create new user
+            Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
+            Response response = builder.post(Entity.entity(newUser, MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) { //user successfully created
-            //current token is that of the newly added user
-            _token = response.getCookies().get("token");
-            return newUser;
-        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
-            throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
-        } else {
-            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) { //user successfully created
+                //current token is that of the newly added user
+                _token = response.getCookies().get("token");
+                return newUser;
+            } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
+                throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
+            } else {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+        } finally {
+            client.close();
         }
     }
 
@@ -191,29 +202,34 @@ public class DefaultService implements ConcertService {
     @Override
     public UserDTO authenticateUser(UserDTO userDTO) throws ServiceException {
         Client client = ClientBuilder.newClient();
+        try {
 
-        //request will only be generated if all required fields are set
-        if (userDTO.getUserName() == null || userDTO.getPassword() == null) {
-            throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
+            //request will only be generated if all required fields are set
+            if (userDTO.getUserName() == null || userDTO.getPassword() == null) {
+                throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
+            }
+
+            //authenticate input user by invoking a request
+            String uri = USER_WEB_SERVICE_URI + "/authenticate";
+
+            Invocation.Builder builder = client.target(uri).request();
+            Response response = builder.post(Entity.entity(userDTO, MediaType.APPLICATION_XML));
+
+            //there is no user with the given username
+            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
+            } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
+                throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
+            } else if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+
+            userDTO = response.readEntity(UserDTO.class);
+            _token = response.getCookies().get("token");
+            return userDTO;
+        } finally {
+            client.close();
         }
-
-        //authenticate input user by invoking a request
-        String uri = USER_WEB_SERVICE_URI + "/authenticate";
-
-        Invocation.Builder builder = client.target(uri).request();
-        Response response = builder.post(Entity.entity(userDTO, MediaType.APPLICATION_XML));
-        checkForServerError(response);
-
-        //there is no user with the given username
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
-            throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
-        }
-
-        userDTO = response.readEntity(UserDTO.class);
-        _token = response.getCookies().get("token");
-        return userDTO;
     }
 
     /**
@@ -235,29 +251,33 @@ public class DefaultService implements ConcertService {
     public Image getImageForPerformer(PerformerDTO performerDTO) throws ServiceException {
         Client client = ClientBuilder.newClient();
 
-        String performerURI = PERFORMER_WEB_SERVICE_URI + "/" + performerDTO.getId();
+        try {
+            String performerURI = PERFORMER_WEB_SERVICE_URI + "/" + performerDTO.getId();
 
-        //retrieve the performer from the DB with the given ID
-        Invocation.Builder builder = client.target(performerURI).request()
-                .accept(MediaType.APPLICATION_XML);
+            //retrieve the performer from the DB with the given ID
+            Invocation.Builder builder = client.target(performerURI).request()
+                    .accept(MediaType.APPLICATION_XML);
 
-        Response response = builder.get();
-        checkForServerError(response);
+            Response response = builder.get();
 
-        //no performer has been found in the DB with the given details
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+            //no performer has been found in the DB with the given details
+            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+            } else if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+
+            String imageName = performerDTO.getImageName();
+
+            //checks that performer image is not null
+            if (imageName == null) {
+                throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+            }
+
+            return AWSUtil.downloadImageFromAWS(imageName);
+        } finally {
+            client.close();
         }
-
-        String imageName = performerDTO.getImageName();
-
-        //checks that performer image is not null
-        if (imageName == null) {
-            throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
-        }
-
-        return AWSUtil.downloadImageFromAWS(imageName);
-
     }
 
 
@@ -311,24 +331,28 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        String uri = RESERVATION_WEB_SERVICE_URI + "/reserve";
+        try {
+            String uri = RESERVATION_WEB_SERVICE_URI + "/reserve";
 
-        Invocation.Builder builder = client.target(uri).request()
-                .accept(MediaType.APPLICATION_XML).cookie(_token);
+            Invocation.Builder builder = client.target(uri).request()
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
+            Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) { //reservation has successfully been created
-            ReservationDTO reservationDTO = response.readEntity(ReservationDTO.class);
-            return reservationDTO;
-        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
-        } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
-            throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
-        } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
-            throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
-        } else {
-            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) { //reservation has successfully been created
+                ReservationDTO reservationDTO = response.readEntity(ReservationDTO.class);
+                return reservationDTO;
+            } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+            } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
+                throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
+            } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
+                throw new ServiceException(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION);
+            } else {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+        } finally {
+            client.close();
         }
     }
 
@@ -367,21 +391,27 @@ public class DefaultService implements ConcertService {
         }
 
         Client client = ClientBuilder.newClient();
+        try {
 
-        String uri = RESERVATION_WEB_SERVICE_URI + "/confirm";
+            String uri = RESERVATION_WEB_SERVICE_URI + "/confirm";
 
-        Invocation.Builder builder = client.target(uri).request()
-                .accept(MediaType.APPLICATION_XML).cookie(_token);
+            Invocation.Builder builder = client.target(uri).request()
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
+            Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
 
-        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-        } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
-        } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
-            throw new ServiceException(Messages.EXPIRED_RESERVATION);
-        } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+            } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+            } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
+                throw new ServiceException(Messages.EXPIRED_RESERVATION);
+            } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ServiceException(Messages.CREDIT_CARD_NOT_REGISTERED);
+            } else {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+        } finally {
+            client.close();
         }
     }
 
@@ -412,22 +442,27 @@ public class DefaultService implements ConcertService {
 
         Client client = ClientBuilder.newClient();
 
-        String userURI = USER_WEB_SERVICE_URI + "/registerCard";
+        try {
 
-        Invocation.Builder builder = client.target(userURI).request(MediaType.APPLICATION_XML)
-                .accept(MediaType.APPLICATION_XML).cookie(_token);
+            String userURI = USER_WEB_SERVICE_URI + "/registerCard";
 
-        Response response = builder.put(Entity.entity(creditCard,
-                MediaType.APPLICATION_XML));
+            Invocation.Builder builder = client.target(userURI).request(MediaType.APPLICATION_XML)
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+            Response response = builder.put(Entity.entity(creditCard,
+                    MediaType.APPLICATION_XML));
+
+            if (response.getStatus() == Response.Status.OK.getStatusCode()){
+            } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+            } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
+            } else {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+        } finally {
+            client.close();
         }
-        if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-            throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
-        }
-
-        checkForServerError(response);
     }
 
     /**
@@ -459,34 +494,79 @@ public class DefaultService implements ConcertService {
         }
 
         Client client = ClientBuilder.newClient();
+        try {
+            // Make an invocation on a Concert URI and specify XML as the data return type
+            Invocation.Builder builder = client.target(RESERVATION_WEB_SERVICE_URI).request()
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
 
-        // Make an invocation on a Concert URI and specify XML as the data return type
-        Invocation.Builder builder = client.target(RESERVATION_WEB_SERVICE_URI).request()
-                .accept(MediaType.APPLICATION_XML).cookie(_token);
+            Response response = builder.get();
 
-        Response response = builder.get();
-        checkForServerError(response);
+            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
 
-        Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {
-        });
-        return bookingDTOS;
+            Set<BookingDTO> bookingDTOS = response.readEntity(new GenericType<Set<BookingDTO>>() {
+            });
+            return bookingDTOS;
 
-    }
-
-    public void registerForNewsItems(){
+        } finally {
+            client.close();
+        }
 
     }
 
     /**
-     * Checks that a response did not encounter a service error
-     *
-     * @param response
+     * subscribes an authenticated user to receive notifications of published news items.
      */
-    private void checkForServerError(Response response) {
-        if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
-            throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+    public void subscribe() {
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
         }
+
+        Client client = ClientBuilder.newClient();
+
+        final WebTarget target = client.target(NEWS_ITEM_WEB_SERVICE_URI);
+
+        target.request().cookie(_token).async().get(new InvocationCallback<NewsItem>() {
+            @Override
+            public void completed(NewsItem response) {
+                target.request().async().get(this);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+
+            }
+        });
+
     }
 
+    /**
+     * Publishes news item, server side will send out the news item to all subscribed users.
+     *
+     * @param newsItem: to be sent to listeners
+     */
+    public void publishNewsItem(NewsItem newsItem) {
+        //if token not set, current user is not authenticated
+        if (_token == null) {
+            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+        }
+
+        Client client = ClientBuilder.newClient();
+
+        try {
+            Invocation.Builder builder = client.target(NEWS_ITEM_WEB_SERVICE_URI).request()
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
+
+            Response response = builder.post(Entity.entity(newsItem, MediaType.APPLICATION_XML));
+
+            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+                throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+            }
+        } finally {
+            client.close();
+        }
+    }
 
 }

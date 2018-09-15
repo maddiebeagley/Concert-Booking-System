@@ -4,6 +4,7 @@ import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatRow;
+import nz.ac.auckland.concert.service.domain.jpa.NewsItem;
 import nz.ac.auckland.concert.service.services.ConcertApplication;
 import nz.ac.auckland.concert.utility.TheatreLayout;
 import org.eclipse.jetty.server.Server;
@@ -46,10 +47,7 @@ import static org.junit.Assert.*;
  *
  */
 public class ConcertServiceTest {
-	
-	private static Logger _logger = LoggerFactory
-			.getLogger(ConcertServiceTest.class);
-	
+
 	private static final int SERVER_PORT = 10000;
 	private static final String WEB_SERVICE_CLASS_NAME = ConcertApplication.class.getName();
 	private static final int RESERVATION_EXPIRY_TIME_IN_SECONDS = 5;
@@ -484,4 +482,22 @@ public class ConcertServiceTest {
 		assertEquals(performers, performersCached);
 		assertEquals(numberOfPerformers, performers.size());
 	}
+
+
+	@Test
+    public void testSubscription(){
+	    try{
+	        _service.subscribe();
+	        _service.subscribe();
+	        _service.subscribe();
+
+            NewsItem newsItem = new NewsItem("NEWS REPORT", "this is a news report", LocalDate.now());
+
+            _service.publishNewsItem(newsItem);
+
+        } catch (Exception e) {
+	        e.printStackTrace();
+	        fail();
+        }
+    }
 }

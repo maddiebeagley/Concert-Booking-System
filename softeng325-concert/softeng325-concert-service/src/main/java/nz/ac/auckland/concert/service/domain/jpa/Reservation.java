@@ -88,7 +88,7 @@ public class Reservation {
 	}
 
 	public Set<Seat> getSeats() {
-		return Collections.unmodifiableSet(_seats);
+		return _seats;
 	}
 
 	public ReservationStatus getReservationStatus(){

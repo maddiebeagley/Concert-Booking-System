@@ -10,6 +10,7 @@ import nz.ac.auckland.concert.common.dto.PerformerDTO;
 import nz.ac.auckland.concert.common.dto.ReservationDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
 import nz.ac.auckland.concert.common.dto.UserDTO;
+import nz.ac.auckland.concert.service.domain.jpa.NewsItem;
 
 
 /**
@@ -242,4 +243,8 @@ public interface ConcertService {
 	 * 
 	 */
 	Set<BookingDTO> getBookings() throws ServiceException;
+
+	void subscribe();
+
+	void publishNewsItem(NewsItem newsItem);
 }

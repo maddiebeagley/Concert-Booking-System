@@ -90,7 +90,6 @@ public class ReservationResource {
                     seatsToReserve = reserveSeats(reservationRequestDTO);
                     seatsReserved = true;
                 } catch (OptimisticEntityLockException e) {
-                    System.out.println("Concurrency issue whilst reserving seats");
                 }
             }
 

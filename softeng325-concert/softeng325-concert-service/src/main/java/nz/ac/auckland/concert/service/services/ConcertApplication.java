@@ -17,6 +17,7 @@ public class ConcertApplication extends Application {
         _classes.add(ReservationResource.class);
         _classes.add(PerformerResource.class);
         _classes.add(UserResource.class);
+        _singletons.add(new NewsItemResource());
     }
 
     @Override
