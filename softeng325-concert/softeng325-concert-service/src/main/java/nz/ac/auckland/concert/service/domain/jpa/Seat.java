@@ -32,8 +32,8 @@ public class Seat {
 	@Column(name = "version")
 	private long _version;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Reservation _reservation;
+//	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private Reservation _reservation;
 
 	@Enumerated(EnumType.STRING)
 	private PriceBand _seatType;
@@ -71,14 +71,14 @@ public class Seat {
 	public SeatNumber getNumber() {
 		return _number;
 	}
-
-	public Reservation getReservation() {
-		return _reservation;
-	}
-
-	public void setReservation(Reservation _reservation) {
-		this._reservation = _reservation;
-	}
+//
+//	public Reservation getReservation() {
+//		return _reservation;
+//	}
+//
+//	public void setReservation(Reservation _reservation) {
+//		this._reservation = _reservation;
+//	}
 
 	public SeatStatus getSeatStatus(){
 		return _seatStatus;

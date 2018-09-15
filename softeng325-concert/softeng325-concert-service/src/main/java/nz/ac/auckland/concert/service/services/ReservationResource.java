@@ -101,8 +101,13 @@ public class ReservationResource {
             em.getTransaction().begin();
 
             //generates a new reservation for the user
-            Reservation reservation = new Reservation(ReservationMapper.toRequestDomain(reservationRequestDTO),
-                    seatsToReserve, user.getUserName());
+            Reservation reservation = new Reservation(
+                    seatsToReserve,
+                    user.getUserName(),
+                    reservationRequestDTO.getNumberOfSeats(),
+                    reservationRequestDTO.getSeatType(),
+                    reservationRequestDTO.getConcertId(),
+                    reservationRequestDTO.getDate());
 
             em.persist(reservation);
             em.getTransaction().commit();
@@ -211,7 +216,7 @@ public class ReservationResource {
 
             //convert the given reservations to a transferrable DTO form
             for (Reservation reservation : reservations) {
-                Concert concert = em.find(Concert.class, reservation.getReservationRequest().getConcertId());
+                Concert concert = em.find(Concert.class, reservation.getConcertId());
                 bookingDTOs.add(ReservationMapper.toBookingDTO(reservation, concert.getTitle()));
             }
             em.getTransaction().commit();
@@ -282,7 +287,7 @@ public class ReservationResource {
 
             //find all the reservations associated to the supplied concert on supplied date
             List<Reservation> reservations = em.createQuery("SELECT r FROM Reservation r WHERE " +
-                    "r._request._concertId = :concertId AND r._request._date = :dateTime", Reservation.class)
+                    "r._concertId = :concertId AND r._date = :dateTime", Reservation.class)
                     .setParameter("concertId", concertId)
                     .setParameter("dateTime", dateTime)
                     .getResultList();

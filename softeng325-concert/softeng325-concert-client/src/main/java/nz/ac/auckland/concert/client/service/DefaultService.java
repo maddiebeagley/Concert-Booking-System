@@ -473,6 +473,10 @@ public class DefaultService implements ConcertService {
 
     }
 
+    public void registerForNewsItems(){
+
+    }
+
     /**
      * Checks that a response did not encounter a service error
      *

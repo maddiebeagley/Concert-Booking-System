@@ -1,5 +1,7 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
+import nz.ac.auckland.concert.common.types.PriceBand;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -34,8 +36,17 @@ public class Reservation {
 	@Column(name = "userName")
 	private String _userName;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	private ReservationRequest _request;
+	@Column(name = "numberOfSeats")
+	private int _numberOfSeats;
+
+	@Column(name = "seatType")
+	private PriceBand _seatType;
+
+	@Column(name = "concertId")
+	private Long _concertId;
+
+	@Column(name = "concertDate")
+	private LocalDateTime _date;
 
 	@Column(name = "reservationTime")
 	private LocalDateTime _reservationTime;
@@ -52,12 +63,17 @@ public class Reservation {
 	public Reservation() {}
 
 	// Sets the field reservation time to store the instant the reservation was created
-	public Reservation(ReservationRequest request, Set<Seat> seats, String userName) {
-		_request = request;
+	public Reservation(Set<Seat> seats, String userName, int numberOfSeats, PriceBand seatType,
+                       long concertId, LocalDateTime date) {
 		_seats = new HashSet<>(seats);
+
 		_userName = userName;
         _reservationTime = LocalDateTime.now();
         _reservationStatus = ReservationStatus.RESERVED;
+        _numberOfSeats = numberOfSeats;
+        _seatType = seatType;
+        _concertId = concertId;
+        _date = date;
 
         //when a reservation is initialised, all associated seats should be set to reserved.
         for (Seat seat : _seats) {
@@ -73,10 +89,6 @@ public class Reservation {
 		return _reservationTime;
 	}
 
-	public ReservationRequest getReservationRequest() {
-		return _request;
-	}
-	
 	public Set<Seat> getSeats() {
 		return Collections.unmodifiableSet(_seats);
 	}
@@ -99,6 +111,22 @@ public class Reservation {
                 seat.setSeatStatus(Seat.SeatStatus.AVAILABLE);
             }
         }
+	}
+
+	public int getNumberOfSeats() {
+		return _numberOfSeats;
+	}
+
+	public PriceBand getSeatType() {
+		return _seatType;
+	}
+
+	public Long getConcertId() {
+		return _concertId;
+	}
+
+	public LocalDateTime getDate() {
+		return _date;
 	}
 
 }

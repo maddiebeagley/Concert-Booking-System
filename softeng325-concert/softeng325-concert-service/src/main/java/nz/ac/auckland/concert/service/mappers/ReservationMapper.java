@@ -4,13 +4,11 @@ import nz.ac.auckland.concert.common.dto.BookingDTO;
 import nz.ac.auckland.concert.common.dto.ReservationDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
 import nz.ac.auckland.concert.common.dto.SeatDTO;
-import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.service.domain.jpa.Reservation;
-import nz.ac.auckland.concert.service.domain.jpa.ReservationRequest;
 import nz.ac.auckland.concert.service.domain.jpa.Seat;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple helper class for converting to and from DTO and domain instances.
@@ -32,36 +30,20 @@ public class ReservationMapper {
             seatDTOs.add(SeatMapper.toDTO(seat));
         }
 
+        ReservationRequestDTO reservationRequestDTO = new ReservationRequestDTO(
+                reservation.getNumberOfSeats(),
+                reservation.getSeatType(),
+                reservation.getConcertId(),
+                reservation.getDate()
+        );
+
         return new ReservationDTO(
                 reservation.getReservationId(),
-                toRequestDTO(reservation.getReservationRequest()),
+                reservationRequestDTO,
                 seatDTOs
         );
     }
 
-    /**
-     * Converts a Reservation Request to its corresponding DTO object.
-     */
-    public static ReservationRequestDTO toRequestDTO(ReservationRequest reservationRequest) {
-        return new ReservationRequestDTO(
-                reservationRequest.getNumberOfSeats(),
-                reservationRequest.getSeatType(),
-                reservationRequest.getConcertId(),
-                reservationRequest.getDate()
-        );
-    }
-
-    /**
-     * Converts a ReservationRequest DTO instance into a corresponding domain model instance.
-     */
-    public static ReservationRequest toRequestDomain(ReservationRequestDTO reservationRequestDTO) {
-        return new ReservationRequest(
-                reservationRequestDTO.getNumberOfSeats(),
-                reservationRequestDTO.getSeatType(),
-                reservationRequestDTO.getConcertId(),
-                reservationRequestDTO.getDate()
-        );
-    }
 
     /**
      * Converts a Reservation into a booking DTO object since bookings and reservations are
@@ -71,11 +53,11 @@ public class ReservationMapper {
 
         Set<SeatDTO> seatDTOs = SeatMapper.toDTOSet(reservation.getSeats());
 
-        return new BookingDTO(reservation.getReservationRequest().getConcertId(),
+        return new BookingDTO(reservation.getConcertId(),
                 concertTitle,
-                reservation.getReservationRequest().getDate(),
+                reservation.getDate(),
                 seatDTOs,
-                reservation.getReservationRequest().getSeatType());
+                reservation.getSeatType());
 
     }
 

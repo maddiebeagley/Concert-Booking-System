@@ -254,7 +254,7 @@ public class ConcertServiceTest {
 			
 			Set<SeatRow> rowsOfStandardSeats = TheatreLayout.getRowsForPriceBand(PriceBand.PriceBandB);
 			int totalNumberOfStandardSeats = 0;
-			for(SeatRow row : rowsOfStandardSeats) {
+			for (SeatRow row : rowsOfStandardSeats) {
 				totalNumberOfStandardSeats += TheatreLayout.getNumberOfSeatsForRow(row);
 			}
 			
