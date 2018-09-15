@@ -1,16 +1,8 @@
 package nz.ac.auckland.concert.service.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import nz.ac.auckland.concert.service.domain.jpa.Seat;
 
-import nz.ac.auckland.concert.common.dto.SeatDTO;
-import nz.ac.auckland.concert.common.types.PriceBand;
-import nz.ac.auckland.concert.common.types.SeatNumber;
-import nz.ac.auckland.concert.common.types.SeatRow;
-import nz.ac.auckland.concert.utility.TheatreLayout;
+import java.util.*;
 
 /**
  * Utility class with a search method that identifies seats that are available
@@ -25,36 +17,32 @@ public class TheatreUtility {
 	 * 
 	 * @param numberOfSeats
 	 *            the number of seats required.
-	 * @param price
-	 *            the priceband to search.
-	 * @param bookedSeats
-	 *            the set of seats that is currently booked.
+	 * @param availableSeats
+	 *            the set of seats that are currently available.
 	 * 
 	 * @return a set of seats that are available to book. When successful the
 	 *         set is non-empty and contains numberOfSeats seats that are within
 	 *         the specified priceband. When not successful (i.e. when there are
 	 *         not enough seats available in the required priceband, this method
 	 *         returns the empty set.
-	 * 
-	 */
-	public static Set<SeatDTO> findAvailableSeats(int numberOfSeats,
-			PriceBand price, Set<SeatDTO> bookedSeats) {
-		List<SeatDTO> openSeats = getAllAvailableSeatsByPrice(price,
-				bookedSeats);
+	 *
+	*/
+	public static Set<Seat> findAvailableSeats(int numberOfSeats,
+			Set<Seat> availableSeats) {
 
-		if (openSeats.size() < numberOfSeats) {
-			return new HashSet<SeatDTO>();
+		if (availableSeats.size() < numberOfSeats) {
+			return new HashSet<Seat>();
 		}
 
 		return getSpecificAvailableSeats(
-				new Random().nextInt(openSeats.size()), numberOfSeats,
-				openSeats);
+				new Random().nextInt(availableSeats.size()), numberOfSeats,
+				new ArrayList<>(availableSeats));
 	}
 
 
-	protected static Set<SeatDTO> getSpecificAvailableSeats(int startIndex,
-			int numberOfSeats, List<SeatDTO> openSeats) {
-		Set<SeatDTO> availableSeats = new HashSet<SeatDTO>();
+	protected static Set<Seat> getSpecificAvailableSeats(int startIndex,
+														 int numberOfSeats, List<Seat> openSeats) {
+		Set<Seat> availableSeats = new HashSet<Seat>();
 		while (numberOfSeats > 0) {
 			if (startIndex > openSeats.size() - 1) {
 				startIndex = 0;
@@ -65,22 +53,5 @@ public class TheatreUtility {
 		}
 		return availableSeats;
 
-	}
-
-	protected static List<SeatDTO> getAllAvailableSeatsByPrice(PriceBand price,
-			Set<SeatDTO> bookedSeats) {
-		List<SeatDTO> openSeats = new ArrayList<SeatDTO>();
-		Set<SeatRow> rowsInPriceBand = TheatreLayout
-				.getRowsForPriceBand(price);
-
-		for (SeatRow row : rowsInPriceBand) {
-			for (int i = 1; i <= TheatreLayout.getNumberOfSeatsForRow(row); i++) {
-				SeatDTO seat = new SeatDTO(row, new SeatNumber(i));
-				if (!bookedSeats.contains(seat)) {
-					openSeats.add(seat);
-				}
-			}
-		}
-		return openSeats;
 	}
 }

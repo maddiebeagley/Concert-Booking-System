@@ -3,7 +3,6 @@ package nz.ac.auckland.concert.service.services;
 import nz.ac.auckland.concert.common.dto.BookingDTO;
 import nz.ac.auckland.concert.common.dto.ReservationDTO;
 import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
-import nz.ac.auckland.concert.common.dto.SeatDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
@@ -12,11 +11,13 @@ import nz.ac.auckland.concert.service.domain.jpa.Reservation;
 import nz.ac.auckland.concert.service.domain.jpa.Seat;
 import nz.ac.auckland.concert.service.domain.jpa.User;
 import nz.ac.auckland.concert.service.mappers.ReservationMapper;
-import nz.ac.auckland.concert.service.mappers.SeatMapper;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
 import nz.ac.auckland.concert.utility.TheatreLayout;
+import org.hibernate.dialect.lock.OptimisticEntityLockException;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -76,58 +77,32 @@ public class ReservationResource {
             }
 
             em.getTransaction().commit();
-            em.getTransaction().begin();
 
             // initialise seats if they are not yet in DB
             initialiseSeats(concertId, reservationRequestDTO.getDate());
 
-            // find all the confirmed bookings for the required concert instance and price band
-            TypedQuery<Seat> seatQuery = em.createQuery("SELECT s FROM Seat s WHERE "
-                    + "s._concertId = :concertId AND s._seatType = :seatType AND "
-                    + "s._concertDateTime = :dateTime AND s._seatStatus <> :seatStatus", Seat.class)
-                    .setParameter("concertId", concertId)
-                    .setParameter("seatStatus", Seat.SeatStatus.AVAILABLE)
-                    .setParameter("seatType", reservationRequestDTO.getSeatType())
-                    .setParameter("dateTime", concertDateTime);
+            boolean seatsReserved = false;
+            Set<Seat> seatsToReserve = new HashSet<>();
 
-            Set<SeatDTO> bookedSeats = SeatMapper.toDTOSet(new HashSet<Seat>(seatQuery.getResultList()));
+            //try to book seats until there are no concurrency issues
+            while (!seatsReserved) {
+                try {
+                    seatsToReserve = reserveSeats(reservationRequestDTO);
+                    seatsReserved = true;
+                } catch (OptimisticEntityLockException e) {
+                    System.out.println("Concurrency issue whilst reserving seats");
+                }
+            }
 
-            em.getTransaction().commit();
-
-            //find a set of seats that the user is able to reserve
-            Set<SeatDTO> availableSeatDTOs = TheatreUtility.findAvailableSeats(reservationRequestDTO.getNumberOfSeats(),
-                    reservationRequestDTO.getSeatType(),
-                    bookedSeats);
-
-            if (availableSeatDTOs.isEmpty()) { //there are no seats available to book, reservation cannot go through
+            if (seatsToReserve.isEmpty()) { // there aren't enough seats left for this reservation
                 return Response.status(Response.Status.NOT_ACCEPTABLE).build();
             }
 
-            Set<Seat> availableSeats = new HashSet<>();
-
-            em.getTransaction().begin();
-
-            //checks that the "available" seats have not already been reserved
-            for (SeatDTO seatDTO : availableSeatDTOs) {
-                Seat seat = em.createQuery("SELECT s FROM Seat s WHERE " +
-                        "s._row = :row AND s._number =:number AND " +
-                        "s._concertDateTime = :dateTime AND s._concertId = :concertId", Seat.class)
-                        .setParameter("row", seatDTO.getRow())
-                        .setParameter("number", seatDTO.getNumber())
-                        .setParameter("dateTime", concertDateTime)
-                        .setParameter("concertId", concertId)
-                        .getSingleResult();
-                if (seat.getSeatStatus().equals(Seat.SeatStatus.RESERVED)){
-                    return Response.status(Response.Status.NOT_ACCEPTABLE).build();
-                }
-                availableSeats.add(seat);
-            }
-            em.getTransaction().commit();
             em.getTransaction().begin();
 
             //generates a new reservation for the user
             Reservation reservation = new Reservation(ReservationMapper.toRequestDomain(reservationRequestDTO),
-                    availableSeats, user.getUserName());
+                    seatsToReserve, user.getUserName());
 
             em.persist(reservation);
             em.getTransaction().commit();
@@ -200,7 +175,7 @@ public class ReservationResource {
     }
 
     @GET
-    public Response getBookings(@CookieParam("token") Cookie token){
+    public Response getBookings(@CookieParam("token") Cookie token) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
@@ -222,7 +197,7 @@ public class ReservationResource {
             String userName = user.getUserName();
 
             //return all the confirmed reservations (bookings) from the given user
-            List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
+            List<Reservation> reservations = em.createQuery("SELECT r FROM Reservation r WHERE " +
                     "r._userName = :userName AND r._reservationStatus = :reservationStatus", Reservation.class)
                     .setParameter("userName", userName)
                     .setParameter("reservationStatus", Reservation.ReservationStatus.CONFIRMED)
@@ -299,14 +274,14 @@ public class ReservationResource {
      * reservation that is expired. This will free up the seats in the reservation so that other users are able
      * to book them.
      */
-    private void checkForExpiredReservations(Long concertId, LocalDateTime dateTime){
+    private void checkForExpiredReservations(Long concertId, LocalDateTime dateTime) {
         EntityManager em = PersistenceManager.instance().createEntityManager();
 
         try {
             em.getTransaction().begin();
 
             //find all the reservations associated to the supplied concert on supplied date
-            List<Reservation> reservations = em.createQuery( "SELECT r FROM Reservation r WHERE " +
+            List<Reservation> reservations = em.createQuery("SELECT r FROM Reservation r WHERE " +
                     "r._request._concertId = :concertId AND r._request._date = :dateTime", Reservation.class)
                     .setParameter("concertId", concertId)
                     .setParameter("dateTime", dateTime)
@@ -321,6 +296,52 @@ public class ReservationResource {
             }
 
             em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Will optimistically lock all seats currently available to be booked until they have been set to reserved and
+     * persisted to the DB. If concurrent access is detected, an exception will be thrown which will be detected by
+     * the calling method. Method can be re-run until an exception is not thrown.
+     */
+    private Set<Seat> reserveSeats(ReservationRequestDTO reservationRequestDTO) throws OptimisticEntityLockException {
+        EntityManager em = PersistenceManager.instance().createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            // find all the available seats for the required concert instance and price band
+            List<Seat> allAvailableSeats = em.createQuery("SELECT s FROM Seat s WHERE "
+                    + "s._concertId = :concertId AND s._seatType = :seatType AND "
+                    + "s._concertDateTime = :dateTime AND s._seatStatus = :seatStatus", Seat.class)
+                    .setParameter("concertId", reservationRequestDTO.getConcertId())
+                    .setParameter("seatStatus", Seat.SeatStatus.AVAILABLE)
+                    .setParameter("seatType", reservationRequestDTO.getSeatType())
+                    .setParameter("dateTime", reservationRequestDTO.getDate())
+                    .setLockMode(LockModeType.OPTIMISTIC)
+                    .getResultList();
+
+            //find a set of seats that the user is able to reserve
+            Set<Seat> seatsToReserve = TheatreUtility.findAvailableSeats(reservationRequestDTO.getNumberOfSeats(),
+                    new HashSet<>(allAvailableSeats));
+
+            if (seatsToReserve.isEmpty()) { //there are no seats available to book, reservation cannot go through
+                return seatsToReserve;
+            }
+
+            //ensure all the seats in the reservation are marked as reserved
+            for (Seat seat : seatsToReserve) {
+                seat.setSeatStatus(Seat.SeatStatus.RESERVED);
+                em.persist(seat);
+            }
+
+            em.getTransaction().commit();
+
+            return seatsToReserve;
 
         } finally {
             em.close();
