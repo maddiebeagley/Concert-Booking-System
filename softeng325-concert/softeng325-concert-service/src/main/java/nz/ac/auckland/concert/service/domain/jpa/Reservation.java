@@ -66,7 +66,6 @@ public class Reservation {
 	public Reservation(Set<Seat> seats, String userName, int numberOfSeats, PriceBand seatType,
                        long concertId, LocalDateTime date) {
 		_seats = new HashSet<>(seats);
-
 		_userName = userName;
         _reservationTime = LocalDateTime.now();
         _reservationStatus = ReservationStatus.RESERVED;
@@ -74,11 +73,6 @@ public class Reservation {
         _seatType = seatType;
         _concertId = concertId;
         _date = date;
-
-        //when a reservation is initialised, all associated seats should be set to reserved.
-        for (Seat seat : _seats) {
-            seat.setSeatStatus(Seat.SeatStatus.RESERVED);
-        }
     }
 	
 	public Long getReservationId() {
@@ -87,6 +81,10 @@ public class Reservation {
 
 	public LocalDateTime getReservationTime() {
 		return _reservationTime;
+	}
+
+	public void setSeats(Set<Seat> seats) {
+		_seats = seats;
 	}
 
 	public Set<Seat> getSeats() {
@@ -99,18 +97,6 @@ public class Reservation {
 
 	public void setReservationStatus(ReservationStatus reservationStatus) {
         _reservationStatus = reservationStatus;
-
-		if (_reservationStatus.equals(ReservationStatus.CONFIRMED)){
-		    //seats should be confirmed when a reservation is confirmed
-			for (Seat seat : _seats) {
-				seat.setSeatStatus(Seat.SeatStatus.CONFIRMED);
-			}
-		} else if (_reservationStatus.equals(ReservationStatus.EXPIRED)) {
-		    //seats should be reset to available when a reservation expires
-            for (Seat seat : _seats) {
-                seat.setSeatStatus(Seat.SeatStatus.AVAILABLE);
-            }
-        }
 	}
 
 	public int getNumberOfSeats() {

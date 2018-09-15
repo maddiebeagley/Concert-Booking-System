@@ -160,6 +160,7 @@ public class ReservationResource {
             if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
                 if (!reservation.getReservationStatus().equals(Reservation.ReservationStatus.EXPIRED)) {
                     reservation.setReservationStatus(Reservation.ReservationStatus.EXPIRED);
+                    reservation.setSeats(setSeatState(reservation.getSeats(), Seat.SeatStatus.AVAILABLE));
                     em.merge(reservation);
                     em.getTransaction().commit();
                 }
@@ -167,6 +168,7 @@ public class ReservationResource {
             }
 
             reservation.setReservationStatus(Reservation.ReservationStatus.CONFIRMED);
+            reservation.setSeats(setSeatState(reservation.getSeats(), Seat.SeatStatus.CONFIRMED));
 
             em.merge(reservation);
             em.getTransaction().commit();
@@ -296,6 +298,7 @@ public class ReservationResource {
             for (Reservation reservation : reservations) {
                 if (reservation.getReservationTime().plus(_time).isBefore(LocalDateTime.now())) {
                     reservation.setReservationStatus(Reservation.ReservationStatus.EXPIRED);
+                    reservation.setSeats(setSeatState(reservation.getSeats(), Seat.SeatStatus.AVAILABLE));
                     em.merge(reservation);
                 }
             }
@@ -351,6 +354,14 @@ public class ReservationResource {
         } finally {
             em.close();
         }
+    }
+
+    private Set<Seat> setSeatState(Set<Seat> seats, Seat.SeatStatus seatStatus) {
+
+        for (Seat seat : seats) {
+            seat.setSeatStatus(seatStatus);
+        }
+        return seats;
 
     }
 }
