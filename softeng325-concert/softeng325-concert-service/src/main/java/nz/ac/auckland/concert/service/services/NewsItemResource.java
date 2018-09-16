@@ -69,7 +69,7 @@ public class NewsItemResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            //remove the user from the list of registered listeners
+            //remove the authenticated user from the list of registered listeners
             if (listeners.containsKey(user.getUserName())) {
                 listeners.remove(user.getUserName());
             }

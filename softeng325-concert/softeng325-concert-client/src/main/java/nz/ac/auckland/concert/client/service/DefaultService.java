@@ -46,6 +46,7 @@ public class DefaultService implements ConcertService {
         Client client = ClientBuilder.newClient();
 
         try {
+            //if the cache is out of date or has not been set, retrieve concerts from DB
             if (_concertCacheExpiry == null || _concertCacheExpiry.isBefore(LocalDateTime.now())) {
 
                 // Make an invocation on a Concert URI and specify XML as the data return type
@@ -54,6 +55,7 @@ public class DefaultService implements ConcertService {
 
                 Response response = builder.get();
 
+                //check that request did not encounter errors
                 if (response.getStatus() != Response.Status.OK.getStatusCode()) {
                     throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
                 }
@@ -61,6 +63,7 @@ public class DefaultService implements ConcertService {
                 Set<ConcertDTO> concertDTOS = response.readEntity(new GenericType<Set<ConcertDTO>>() {
                 });
 
+                //reset cache with new data from DB
                 CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
 
                 int cacheTime = cacheControl.getMaxAge();
@@ -90,6 +93,7 @@ public class DefaultService implements ConcertService {
         Client client = ClientBuilder.newClient();
 
         try {
+            //if the cache has not been set or is out of date, retrieve performers from DB
             if (_performerCacheExpiry == null || _performerCacheExpiry.isBefore(LocalDateTime.now())) {
                 // Make an invocation on a Concert URI and specify XML as the data return type
                 Invocation.Builder builder = client.target(PERFORMER_WEB_SERVICE_URI).request()
@@ -104,6 +108,7 @@ public class DefaultService implements ConcertService {
                 Set<PerformerDTO> performerDTOS = response.readEntity(new GenericType<Set<PerformerDTO>>() {
                 });
 
+                //reset cache data
                 CacheControl cacheControl = CacheControl.valueOf(response.getHeaderString(HttpHeaders.CACHE_CONTROL));
 
                 int cacheTime = cacheControl.getMaxAge();
@@ -158,6 +163,7 @@ public class DefaultService implements ConcertService {
             Invocation.Builder builder = client.target(USER_WEB_SERVICE_URI).request().accept(MediaType.APPLICATION_XML);
             Response response = builder.post(Entity.entity(newUser, MediaType.APPLICATION_XML));
 
+            //verify the status of the response
             if (response.getStatus() == Response.Status.CREATED.getStatusCode()) { //user successfully created
                 //current token is that of the newly added user
                 _token = response.getCookies().get("token");
@@ -215,7 +221,7 @@ public class DefaultService implements ConcertService {
             Invocation.Builder builder = client.target(uri).request();
             Response response = builder.post(Entity.entity(userDTO, MediaType.APPLICATION_XML));
 
-            //there is no user with the given username
+            //verify the status of the response
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
             } else if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
@@ -339,6 +345,7 @@ public class DefaultService implements ConcertService {
 
             Response response = builder.post(Entity.entity(reservationRequestDTO, MediaType.APPLICATION_XML));
 
+            //verify the status of the response
             if (response.getStatus() == Response.Status.OK.getStatusCode()) { //reservation has successfully been created
                 ReservationDTO reservationDTO = response.readEntity(ReservationDTO.class);
                 return reservationDTO;
@@ -395,11 +402,13 @@ public class DefaultService implements ConcertService {
 
             String uri = RESERVATION_WEB_SERVICE_URI + "/confirm";
 
+            //confirm the given requestDTO
             Invocation.Builder builder = client.target(uri).request()
                     .accept(MediaType.APPLICATION_XML).cookie(_token);
 
             Response response = builder.post(Entity.entity(reservationDTO, MediaType.APPLICATION_XML));
 
+            //verify the status of the response
             if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
             } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
                 throw new ServiceException(Messages.BAD_AUTHENTICATON_TOKEN);
@@ -452,7 +461,8 @@ public class DefaultService implements ConcertService {
             Response response = builder.put(Entity.entity(creditCard,
                     MediaType.APPLICATION_XML));
 
-            if (response.getStatus() == Response.Status.OK.getStatusCode()){
+            //verify the status of the response
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
             } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
@@ -546,7 +556,7 @@ public class DefaultService implements ConcertService {
     /**
      * Unsubscribes the currently authenticated user from the news item subscription.
      */
-    public void unsubscribe(){
+    public void unsubscribe() {
         Client client = ClientBuilder.newClient();
 
         try {
@@ -556,6 +566,7 @@ public class DefaultService implements ConcertService {
 
             Response response = builder.delete();
 
+            //verify the status of the response
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
             } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
