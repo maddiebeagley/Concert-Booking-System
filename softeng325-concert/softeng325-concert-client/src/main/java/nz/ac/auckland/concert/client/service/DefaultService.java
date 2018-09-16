@@ -516,7 +516,7 @@ public class DefaultService implements ConcertService {
     }
 
     /**
-     * subscribes an authenticated user to receive notifications of published news items.
+     * subscribes authenticated user to receive notifications of published news items.
      */
     public void subscribe() {
         //if token not set, current user is not authenticated
@@ -528,6 +528,7 @@ public class DefaultService implements ConcertService {
 
         final WebTarget target = client.target(NEWS_ITEM_WEB_SERVICE_URI);
 
+        //attach a cookie to request to ensure user is authenticated
         target.request().cookie(_token).async().get(new InvocationCallback<NewsItem>() {
             @Override
             public void completed(NewsItem response) {
@@ -543,19 +544,39 @@ public class DefaultService implements ConcertService {
     }
 
     /**
+     * Unsubscribes the currently authenticated user from the news item subscription.
+     */
+    public void unsubscribe(){
+        Client client = ClientBuilder.newClient();
+
+        try {
+            //posts the input news item to the server for server to notify clients.
+            Invocation.Builder builder = client.target(NEWS_ITEM_WEB_SERVICE_URI).request()
+                    .accept(MediaType.APPLICATION_XML).cookie(_token);
+
+            Response response = builder.delete();
+
+            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+            } else if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+            }
+        } finally {
+            client.close();
+        }
+
+    }
+
+    /**
      * Publishes news item, server side will send out the news item to all subscribed users.
      *
      * @param newsItem: to be sent to listeners
      */
-    public void publishNewsItem(NewsItem newsItem) {
-        //if token not set, current user is not authenticated
-        if (_token == null) {
-            throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
-        }
-
+    public void publishNewsItem(NewsItemDTO newsItem) {
         Client client = ClientBuilder.newClient();
 
         try {
+            //posts the input news item to the server for server to notify clients.
             Invocation.Builder builder = client.target(NEWS_ITEM_WEB_SERVICE_URI).request()
                     .accept(MediaType.APPLICATION_XML).cookie(_token);
 

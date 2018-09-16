@@ -411,11 +411,15 @@ public class ConcertServiceTest {
 		} 
 	}
 
+	/**
+	 * retrieves the images associated to all performers stored in the DB.
+	 */
 	@Test
     public void testRetrieveImagesFromPerformers(){
 	    try {
 	        Set<PerformerDTO> performerDTOS = _service.getPerformers();
 
+	        //get the performer images.
 	        for (PerformerDTO performerDTO : performerDTOS) {
 				_service.getImageForPerformer(performerDTO);
 			}
@@ -425,21 +429,30 @@ public class ConcertServiceTest {
 	    }
     }
 
+	/**
+	 * ensures that cached concerts are returned when the cache is still valid.
+	 */
 	@Test
 	public void testRetrieveConcertsFromCache() {
 		final int numberOfConcerts = 25;
 
+		//retrieve from DB
 		Set<ConcertDTO> concerts = _service.getConcerts();
+		//retrieve from cache
 		Set<ConcertDTO> cachedConcerts = _service.getConcerts();
 
 		assertEquals(concerts, cachedConcerts);
 		assertEquals(numberOfConcerts, concerts.size());
 	}
 
+	/**
+	 * ensures that concerts are retrieved from the DB again after a cache timeout occurs.
+	 */
 	@Test
 	public void testRetrieveConcertsFromCacheUpdate() {
 		final int numberOfConcerts = 25;
 
+		//retrieve from DB
 		Set<ConcertDTO> concerts = _service.getConcerts();
 
 		try {
@@ -448,27 +461,38 @@ public class ConcertServiceTest {
 			e.printStackTrace();
 		}
 
+		//retrieve from DB
 		Set<ConcertDTO> cachedConcerts = _service.getConcerts();
 
 		assertEquals(concerts, cachedConcerts);
 		assertEquals(numberOfConcerts, concerts.size());
 	}
 
+	/**
+	 * ensures that only the cached performers are returned from the client when the cache is
+	 * still valid.
+	 */
 	@Test
 	public void testRetrievePerformersFromCache() {
 		final int numberOfPerformers = 20;
 
+		//retrieve from DB
 		Set<PerformerDTO> performers = _service.getPerformers();
+		//retrieve from cache
 		Set<PerformerDTO> performersCached = _service.getPerformers();
 
 		assertEquals(performers, performersCached);
 		assertEquals(numberOfPerformers, performers.size());
 	}
 
+	/**
+	 * Ensures that concerts are retrieved from the DB after the cache timeout event has occurred.
+	 */
 	@Test
 	public void testRetrievePerformersFromCacheUpdate() {
 		final int numberOfPerformers = 20;
 
+		//retrieve from DB
 		Set<PerformerDTO> performers = _service.getPerformers();
 
 		try {
@@ -477,27 +501,11 @@ public class ConcertServiceTest {
 			e.printStackTrace();
 		}
 
+		//retrieve from DB again since cache will timeout.
 		Set<PerformerDTO> performersCached = _service.getPerformers();
 
 		assertEquals(performers, performersCached);
 		assertEquals(numberOfPerformers, performers.size());
 	}
 
-
-	@Test
-    public void testSubscription(){
-	    try{
-	        _service.subscribe();
-	        _service.subscribe();
-	        _service.subscribe();
-
-            NewsItem newsItem = new NewsItem("NEWS REPORT", "this is a news report", LocalDate.now());
-
-            _service.publishNewsItem(newsItem);
-
-        } catch (Exception e) {
-	        e.printStackTrace();
-	        fail();
-        }
-    }
 }
