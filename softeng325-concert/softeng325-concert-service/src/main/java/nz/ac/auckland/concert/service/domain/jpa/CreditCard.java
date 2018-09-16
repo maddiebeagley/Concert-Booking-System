@@ -1,14 +1,10 @@
 package nz.ac.auckland.concert.service.domain.jpa;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDate;
-
-import nz.ac.auckland.concert.common.jaxb.LocalDateAdapter;
 
 /**
  * DTO class to represent credit cards. 
@@ -26,6 +22,7 @@ public class CreditCard {
 	public enum Type {Visa, Master};
 
 	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
 	private Type _type;
 
 	@Column(name = "name")

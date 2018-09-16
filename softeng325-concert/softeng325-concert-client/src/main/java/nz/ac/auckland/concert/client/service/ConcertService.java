@@ -237,9 +237,21 @@ public interface ConcertService {
 	 */
 	Set<BookingDTO> getBookings() throws ServiceException;
 
+	/**
+	 * subscribes the currently authenticated user to receive notifications of new
+	 * news items.
+	 */
 	void subscribe();
 
+	/**
+	 * sends out a new news item to all subscribed listeners.
+	 * @param newsItem
+	 */
 	void publishNewsItem(NewsItemDTO newsItem);
 
+	/**
+	 * unsubscribes the currently authenticated user to stop receiving notifications
+	 * of news items.
+	 */
 	void unsubscribe();
 }
