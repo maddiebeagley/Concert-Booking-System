@@ -508,4 +508,27 @@ public class ConcertServiceTest {
 		assertEquals(numberOfPerformers, performers.size());
 	}
 
+
+	@Test
+    public void testSubscription(){
+	    try{
+			// Create a User.
+			UserDTO userDTO = new UserDTO("Bulldog", "123", "Churchill", "Winston");
+			_service.createUser(userDTO);
+	        _service.subscribe();
+
+			// Create a User.
+			UserDTO userDTO2 = new UserDTO("HoneyBadger", "badger777", "Clark", "Helen");
+			_service.createUser(userDTO2);
+			_service.subscribe();
+
+            NewsItemDTO newsItem = new NewsItemDTO("NEWS REPORT", "this is a news report", LocalDate.now());
+
+            _service.publishNewsItem(newsItem);
+
+        } catch (Exception e) {
+	        e.printStackTrace();
+	        fail();
+        }
+    }
 }
