@@ -1,1 +1,0 @@
-discuss why you add functionality to client so that requests are only made if you have all fields populated (waste of an HTTP request)
